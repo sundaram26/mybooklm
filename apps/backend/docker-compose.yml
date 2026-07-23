@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: notebooklm
+    restart: always
+    environment: 
+      POSTGRES_USER: postgres
+      POSTGRES_DB: notebooklm
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - notebooklm_data:/var/lib/postgresql/data
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant_db
+    restart: always
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+volumes:
+  notebooklm_data:
+  qdrant_data:

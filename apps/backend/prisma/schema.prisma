@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum DocumentType {
+  LINK
+  FILE
+  TEXT
+  IMAGE
+  OTHER
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+model User {
+  id         String     @id @default(uuid())
+  email      String     @unique
+  name       String?
+  avatarUrl  String?
+  provider   String     @default("google") // e.g., 'google', 'github'
+  providerId String?    @unique // The unique ID provided by Google/GitHub
+  notebooks  Notebook[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Notebook {
+  id          String             @id @default(uuid())
+  title       String
+  
+  // Authentication support
+  userId      String?
+  user        User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guestId     String?            // Identifier for non-logged in users (e.g., local storage ID)
+  
+  documents   NotebookDocument[]
+  sessions    Session[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+model NotebookDocument {
+  id         String       @id @default(uuid())
+  notebookId String
+  notebook   Notebook     @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+  type       DocumentType
+  url        String?      // For links
+  content    String?      // For direct textual data
+  metadata   Json?        // For storing extra info (e.g., { provider: "youtube" }, file size)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+model Session {
+  id         String        @id @default(uuid())
+  notebookId String
+  notebook   Notebook      @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+  title      String?       // Auto-generated or user-provided title
+  messages   ChatMessage[]
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+}
+
+model ChatMessage {
+  id        String        @id @default(uuid())
+  sessionId String
+  session   Session       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      MessageRole
+  content   String
+  
+  // For branching logic: self-relation to form a tree of messages (Max depth 3 enforced in API)
+  parentId  String?
+  parent    ChatMessage?  @relation("MessageToMessage", fields: [parentId], references: [id])
+  replies   ChatMessage[] @relation("MessageToMessage")
+
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
