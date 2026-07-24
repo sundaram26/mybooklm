@@ -27,15 +27,59 @@ enum MessageRole {
 }
 
 model User {
-  id         String     @id @default(uuid())
-  email      String     @unique
-  name       String?
-  avatarUrl  String?
-  provider   String     @default("google") // e.g., 'google', 'github'
-  providerId String?    @unique // The unique ID provided by Google/GitHub
-  notebooks  Notebook[]
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  emailVerified Boolean?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  isAnonymous   Boolean?
+  
+  sessions      Session[]
+  accounts      Account[]
+  notebooks     Notebook[]
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+}
+
+model Account {
+  id                    String    @id @default(uuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model Verification {
+  id         String    @id @default(uuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model Notebook {
@@ -48,7 +92,7 @@ model Notebook {
   guestId     String?            // Identifier for non-logged in users (e.g., local storage ID)
   
   documents   NotebookDocument[]
-  sessions    Session[]
+  sessions    ChatSession[]
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
 }
@@ -65,7 +109,7 @@ model NotebookDocument {
   updatedAt  DateTime     @updatedAt
 }
 
-model Session {
+model ChatSession {
   id         String        @id @default(uuid())
   notebookId String
   notebook   Notebook      @relation(fields: [notebookId], references: [id], onDelete: Cascade)
@@ -78,7 +122,7 @@ model Session {
 model ChatMessage {
   id        String        @id @default(uuid())
   sessionId String
-  session   Session       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  session   ChatSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   role      MessageRole
   content   String
   
