@@ -1,5 +1,5 @@
 import type { ILLMProvider } from "../interfaces/provider.interface";
-import { SUPPORTED_MODELS } from "../../config/models";
+import { SUPPORTED_MODELS } from "../../../config/models";
 import { OpenAIAdapter } from "./openai.adapter";
 import { AnthropicAdapter } from "./anthropic.adapter";
 import { GeminiAdapter } from "./gemini.adapter";
@@ -20,7 +20,6 @@ export class ProviderFactory {
             case "google":
                 return new GeminiAdapter(customApiKey);
             default:
-                // Ensure exhaustive matching
                 const _exhaustiveCheck: never = modelConfig.provider as never;
                 throw new Error(`Provider ${modelConfig.provider} is not implemented.`);
         }

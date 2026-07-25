@@ -1,5 +1,5 @@
-import type { ChatMessage } from "../interfaces/provider.interface";
-import { ProviderFactory } from "../providers/provider.factory";
+import type { ChatMessage } from "../../infrastructure/llm/interfaces/provider.interface";
+import { ProviderFactory } from "../../infrastructure/llm/providers/provider.factory";
 
 export class ChatService {
     /**
