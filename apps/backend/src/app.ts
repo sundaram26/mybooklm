@@ -17,8 +17,18 @@ import { createRateLimiter } from "./api/middlewares/rate-limit.middleware";
 const app = express();
 app.use(json());
 
-// Auth handlers (Express 5 named wildcard syntax)
-app.all("/api/auth/*path", toNodeHandler(auth.handler));
+// Auth handlers (Express 5 named wildcard syntax + proxy header normalization)
+app.all("/api/auth/*path", (req, res) => {
+    const proto = req.headers["x-forwarded-proto"];
+    if (proto && typeof proto === "string") {
+        req.headers["x-forwarded-proto"] = proto.split(',')[0]?.trim();
+    }
+    const hostHeader = req.headers["x-forwarded-host"];
+    if (hostHeader && typeof hostHeader === "string") {
+        req.headers["x-forwarded-host"] = hostHeader.split(',')[0]?.trim();
+    }
+    return toNodeHandler(auth.handler)(req, res);
+});
 
 // Static files serving
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));

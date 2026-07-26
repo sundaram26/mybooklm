@@ -12,10 +12,17 @@
   },
   "dependencies": {
     "@repo/ui": "workspace:*",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@tanstack/react-query": "^5.101.4",
+    "better-auth": "^1.6.25",
     "jimp": "^1.6.1",
+    "lucide-react": "^1.27.0",
     "next": "16.2.0",
+    "postcss": "^8.5.23",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "tailwindcss": "^4.3.3",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

@@ -15,11 +15,18 @@ export class DocumentController {
             return;
         }
 
+        const hasSpace = await DocumentService.checkStorageLimit(notebookId, file.size);
+        if (!hasSpace) {
+            res.status(403).json({ success: false, message: "Storage limit exceeded (1 GB per user)." });
+            return;
+        }
+
         const document = await DocumentService.createFileDocument(
             notebookId, 
             file.path, 
             file.originalname, 
-            file.mimetype
+            file.mimetype,
+            file.size
         );
         
         res.status(201).json({ success: true, data: document });
@@ -34,11 +41,18 @@ export class DocumentController {
             return;
         }
 
+        const hasSpace = await DocumentService.checkStorageLimit(notebookId, file.size);
+        if (!hasSpace) {
+            res.status(403).json({ success: false, message: "Storage limit exceeded (1 GB per user)." });
+            return;
+        }
+
         const document = await DocumentService.createImageDocument(
             notebookId, 
             file.path, 
             file.originalname, 
-            file.mimetype
+            file.mimetype,
+            file.size
         );
         
         res.status(201).json({ success: true, data: document });
@@ -78,6 +92,7 @@ export class DocumentController {
         
         const mappedDocuments = documents.map((doc: any) => ({
             ...doc,
+            fileSize: (doc.metadata as any)?.fileSize || 0,
             viewUrl: doc.url?.startsWith("storage://")
                 ? `/api/notebooks/documents/${doc.id}/view`
                 : doc.url
@@ -97,6 +112,7 @@ export class DocumentController {
         
         const mappedDocument = {
             ...document,
+            fileSize: (document.metadata as any)?.fileSize || 0,
             viewUrl: document.url?.startsWith("storage://")
                 ? `/api/notebooks/documents/${document.id}/view`
                 : document.url

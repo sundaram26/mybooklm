@@ -6,9 +6,51 @@ import { QdrantDatabase } from "../../infrastructure/vector_db/qdrant.database";
 
 export class DocumentService {
     /**
+     * Check if a new file will exceed the 1GB limit (1073741824 bytes).
+     * Returns true if upload is allowed, false if limit exceeded.
+     */
+    static async checkStorageLimit(notebookId: string, newFileSize: number): Promise<boolean> {
+        const notebook = await prisma.notebook.findUnique({
+            where: { id: notebookId },
+            select: { userId: true, guestId: true }
+        });
+
+        if (!notebook) return false;
+
+        // Find all notebooks owned by this user/guest
+        const whereClause = notebook.userId 
+            ? { userId: notebook.userId } 
+            : { guestId: notebook.guestId };
+
+        const userNotebooks = await prisma.notebook.findMany({
+            where: whereClause,
+            select: { id: true }
+        });
+
+        const notebookIds = userNotebooks.map(n => n.id);
+
+        // Fetch all documents for these notebooks
+        const documents = await prisma.notebookDocument.findMany({
+            where: { notebookId: { in: notebookIds } },
+            select: { metadata: true }
+        });
+
+        let totalSize = 0;
+        for (const doc of documents) {
+            const meta = doc.metadata as any;
+            if (meta && meta.fileSize) {
+                totalSize += Number(meta.fileSize) || 0;
+            }
+        }
+
+        const limit = 1073741824; // 1 GB in bytes
+        return (totalSize + newFileSize) <= limit;
+    }
+
+    /**
      * Store a file document (PDF, Word, TXT, SRT, etc.)
      */
-    static async createFileDocument(notebookId: string, filePath: string, originalName: string, mimeType: string) {
+    static async createFileDocument(notebookId: string, filePath: string, originalName: string, mimeType: string, fileSize?: number) {
         const doc = await prisma.notebookDocument.create({
             data: {
                 notebookId,
@@ -16,7 +58,8 @@ export class DocumentService {
                 url: filePath,
                 metadata: {
                     originalName,
-                    mimeType
+                    mimeType,
+                    fileSize: fileSize || 0
                 }
             }
         });
@@ -29,7 +72,7 @@ export class DocumentService {
     /**
      * Store an image document
      */
-    static async createImageDocument(notebookId: string, filePath: string, originalName: string, mimeType: string) {
+    static async createImageDocument(notebookId: string, filePath: string, originalName: string, mimeType: string, fileSize?: number) {
         const doc = await prisma.notebookDocument.create({
             data: {
                 notebookId,
@@ -37,7 +80,8 @@ export class DocumentService {
                 url: filePath,
                 metadata: {
                     originalName,
-                    mimeType
+                    mimeType,
+                    fileSize: fileSize || 0
                 }
             }
         });
@@ -57,7 +101,8 @@ export class DocumentService {
                 type: DocumentType.TEXT,
                 content,
                 metadata: {
-                    title: title || "Raw Text Snippet"
+                    title: title || "Raw Text Snippet",
+                    fileSize: content.length
                 }
             }
         });
@@ -85,7 +130,8 @@ export class DocumentService {
                 type: DocumentType.LINK,
                 url,
                 metadata: {
-                    provider
+                    provider,
+                    fileSize: 0
                 }
             }
         });
