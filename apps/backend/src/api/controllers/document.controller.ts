@@ -1,5 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { DocumentService } from "../../core/ingestion/document.service";
+import { RetrievalService } from "../../core/retrieval/retrieval.service";
+import { FileStorageFactory } from "../../infrastructure/file_storage/file-storage.factory";
 import { asyncHandler } from "../../utils/asyncHandler";
 
 export class DocumentController {
@@ -74,7 +76,14 @@ export class DocumentController {
         const notebookId = req.params.notebookId as string;
         const documents = await DocumentService.getNotebookDocuments(notebookId);
         
-        res.status(200).json({ success: true, data: documents });
+        const mappedDocuments = documents.map((doc: any) => ({
+            ...doc,
+            viewUrl: doc.url?.startsWith("storage://")
+                ? `/api/notebooks/documents/${doc.id}/view`
+                : doc.url
+        }));
+        
+        res.status(200).json({ success: true, data: mappedDocuments });
     });
 
     static getDocument = asyncHandler(async (req: Request, res: Response) => {
@@ -86,6 +95,85 @@ export class DocumentController {
             return;
         }
         
-        res.status(200).json({ success: true, data: document });
+        const mappedDocument = {
+            ...document,
+            viewUrl: document.url?.startsWith("storage://")
+                ? `/api/notebooks/documents/${document.id}/view`
+                : document.url
+        };
+        
+        res.status(200).json({ success: true, data: mappedDocument });
+    });
+
+    static retrieveNotebookChunks = asyncHandler(async (req: Request, res: Response) => {
+        const notebookId = req.params.notebookId as string;
+        const query = (req.query.query || req.body.query) as string;
+        const useHyde = req.query.useHyde === "true" || req.body.useHyde === true;
+        const limit = req.query.limit ? parseInt(req.query.limit as string) : (req.body.limit ? parseInt(req.body.limit as string) : 5);
+
+        if (!query) {
+            res.status(400).json({ success: false, message: "Query string is required." });
+            return;
+        }
+
+        const results = await RetrievalService.retrieve(notebookId, query, { useHyde, limit });
+        res.status(200).json({ success: true, data: results });
+    });
+
+    static viewFile = asyncHandler(async (req: Request, res: Response) => {
+        const id = req.params.id as string;
+        const document = await DocumentService.getDocumentById(id);
+        
+        if (!document) {
+            res.status(404).json({ success: false, message: "Document not found" });
+            return;
+        }
+        
+        if (!document.url) {
+            res.status(400).json({ success: false, message: "This document does not have a file attachment." });
+            return;
+        }
+
+        if (document.type !== "FILE" && document.type !== "IMAGE") {
+            res.status(400).json({ success: false, message: "Document is not a file or image." });
+            return;
+        }
+
+        if (!document.url.startsWith("storage://")) {
+            res.status(400).json({ success: false, message: "Invalid document storage URI." });
+            return;
+        }
+
+        const destKey = document.url.replace("storage://", "");
+        
+        try {
+            const storage = FileStorageFactory.getStorage();
+            const buffer = await storage.downloadFile(destKey);
+            
+            const docMetadata = (document.metadata as Record<string, any>) || {};
+            const mimeType = docMetadata.mimeType || "application/octet-stream";
+            const originalName = docMetadata.originalName || "downloaded-file";
+            
+            res.setHeader("Content-Type", mimeType);
+            
+            // Encode filename to support special characters in headers safely
+            const encodedFilename = encodeURIComponent(originalName);
+            res.setHeader("Content-Disposition", `inline; filename="${originalName}"; filename*=UTF-8''${encodedFilename}`);
+            
+            res.send(buffer);
+        } catch (error: any) {
+            console.error(`Failed to stream file for document ${id}:`, error);
+            res.status(500).json({ success: false, message: "Failed to download file from cloud storage." });
+        }
+    });
+
+    static deleteDocument = asyncHandler(async (req: Request, res: Response) => {
+        const id = req.params.id as string;
+        try {
+            await DocumentService.deleteDocument(id);
+            res.status(200).json({ success: true, message: "Document deleted successfully." });
+        } catch (error: any) {
+            res.status(404).json({ success: false, message: error.message || "Failed to delete document." });
+        }
     });
 }

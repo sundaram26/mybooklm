@@ -1,29 +1,36 @@
 import { prisma } from "../../infrastructure/db/prisma";
 import { DocumentType } from "../../../generated/prisma/client";
+import { IngestionProcessor } from "./ingestion.processor";
+import { FileStorageFactory } from "../../infrastructure/file_storage/file-storage.factory";
+import { QdrantDatabase } from "../../infrastructure/vector_db/qdrant.database";
 
 export class DocumentService {
     /**
      * Store a file document (PDF, Word, TXT, SRT, etc.)
      */
     static async createFileDocument(notebookId: string, filePath: string, originalName: string, mimeType: string) {
-        return await prisma.notebookDocument.create({
+        const doc = await prisma.notebookDocument.create({
             data: {
                 notebookId,
                 type: DocumentType.FILE,
-                url: filePath, // Storing local path in URL for now
+                url: filePath,
                 metadata: {
                     originalName,
                     mimeType
                 }
             }
         });
+
+        // Trigger background processing
+        IngestionProcessor.queueIngestion(doc.id);
+        return doc;
     }
 
     /**
      * Store an image document
      */
     static async createImageDocument(notebookId: string, filePath: string, originalName: string, mimeType: string) {
-        return await prisma.notebookDocument.create({
+        const doc = await prisma.notebookDocument.create({
             data: {
                 notebookId,
                 type: DocumentType.IMAGE,
@@ -34,13 +41,17 @@ export class DocumentService {
                 }
             }
         });
+
+        // Trigger background processing
+        IngestionProcessor.queueIngestion(doc.id);
+        return doc;
     }
 
     /**
      * Store raw text content
      */
     static async createTextDocument(notebookId: string, content: string, title?: string) {
-        return await prisma.notebookDocument.create({
+        const doc = await prisma.notebookDocument.create({
             data: {
                 notebookId,
                 type: DocumentType.TEXT,
@@ -50,6 +61,10 @@ export class DocumentService {
                 }
             }
         });
+
+        // Trigger background processing
+        IngestionProcessor.queueIngestion(doc.id);
+        return doc;
     }
 
     /**
@@ -64,7 +79,7 @@ export class DocumentService {
             provider = "google-drive";
         }
 
-        return await prisma.notebookDocument.create({
+        const doc = await prisma.notebookDocument.create({
             data: {
                 notebookId,
                 type: DocumentType.LINK,
@@ -74,6 +89,10 @@ export class DocumentService {
                 }
             }
         });
+
+        // Trigger background processing
+        IngestionProcessor.queueIngestion(doc.id);
+        return doc;
     }
 
     /**
@@ -93,5 +112,39 @@ export class DocumentService {
         return await prisma.notebookDocument.findUnique({
             where: { id }
         });
+    }
+
+    /**
+     * Deletes a document from Postgres, File Storage, and Vector Database.
+     */
+    static async deleteDocument(id: string) {
+        const doc = await prisma.notebookDocument.findUnique({ where: { id } });
+        if (!doc) {
+            throw new Error("Document not found.");
+        }
+
+        // 1. Delete raw file from cloud/local storage
+        if ((doc.type === "FILE" || doc.type === "IMAGE") && doc.url && doc.url.startsWith("storage://")) {
+            const destKey = doc.url.replace("storage://", "");
+            try {
+                const storage = FileStorageFactory.getStorage();
+                await storage.deleteFile(destKey);
+                console.log(`[DocumentService] Deleted raw storage file: ${destKey}`);
+            } catch (err) {
+                console.error(`[DocumentService] Failed to delete raw storage file ${destKey}:`, err);
+            }
+        }
+
+        // 2. Delete points from vector search collection
+        try {
+            const qdrant = new QdrantDatabase();
+            await qdrant.deletePointsByFilter("notebook_chunks", { documentId: id });
+            console.log(`[DocumentService] Cleared vectors matching documentId: ${id}`);
+        } catch (err) {
+            console.error(`[DocumentService] Failed to clean vectors from Qdrant for document ${id}:`, err);
+        }
+
+        // 3. Remove DB record
+        return await prisma.notebookDocument.delete({ where: { id } });
     }
 }

@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { DocumentController } from "../controllers/document.controller";
 import { documentUpload, imageUpload } from "../middlewares/upload.middleware";
-import { requireAuth } from "../middlewares/auth.middleware";
+import { optionalAuth } from "../middlewares/auth.middleware";
 
 export const documentRoutes: Router = Router();
 
-// We are applying requireAuth to all routes here for security.
-// If anonymous upload is needed, you can switch this to optionalAuth or remove it.
-documentRoutes.use(requireAuth);
+// optionalAuth: authenticated users get res.locals.user, guest users pass through without blocking.
+// Guest prompt limits are enforced in the chat controller.
+documentRoutes.use(optionalAuth);
 
 // File uploads
 documentRoutes.post(
@@ -30,3 +30,7 @@ documentRoutes.post("/:notebookId/documents/link", DocumentController.uploadLink
 // Retrieval
 documentRoutes.get("/:notebookId/documents", DocumentController.getNotebookDocuments);
 documentRoutes.get("/documents/:id", DocumentController.getDocument);
+documentRoutes.get("/documents/:id/view", DocumentController.viewFile);
+documentRoutes.delete("/:notebookId/documents/:id", DocumentController.deleteDocument);
+documentRoutes.get("/:notebookId/retrieve", DocumentController.retrieveNotebookChunks);
+documentRoutes.post("/:notebookId/retrieve", DocumentController.retrieveNotebookChunks);

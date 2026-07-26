@@ -1,12 +1,13 @@
 import OpenAI from "openai";
 import type { ILLMProvider, ChatMessage } from "../interfaces/provider.interface";
+import { env } from "../../../config/env.config";
 
 export class OpenAIAdapter implements ILLMProvider {
     private client: OpenAI;
 
     constructor(apiKey?: string) {
-        // If apiKey is not provided, OpenAI SDK automatically picks up process.env.OPENAI_API_KEY
-        this.client = new OpenAI({ apiKey });
+        const key = apiKey || env.OPENAI_API_KEY || "";
+        this.client = new OpenAI({ apiKey: key });
     }
 
     async generateText(modelId: string, messages: ChatMessage[]): Promise<string> {

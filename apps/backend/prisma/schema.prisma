@@ -20,6 +20,13 @@ enum DocumentType {
   OTHER
 }
 
+enum ProcessingStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
 enum MessageRole {
   USER
   ASSISTANT
@@ -98,15 +105,17 @@ model Notebook {
 }
 
 model NotebookDocument {
-  id         String       @id @default(uuid())
-  notebookId String
-  notebook   Notebook     @relation(fields: [notebookId], references: [id], onDelete: Cascade)
-  type       DocumentType
-  url        String?      // For links
-  content    String?      // For direct textual data
-  metadata   Json?        // For storing extra info (e.g., { provider: "youtube" }, file size)
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+  id           String           @id @default(uuid())
+  notebookId   String
+  notebook     Notebook         @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+  type         DocumentType
+  url          String?          // For links
+  content      String?          // For direct textual data
+  metadata     Json?            // For storing extra info (e.g., { provider: "youtube" }, file size)
+  status       ProcessingStatus @default(PENDING)
+  errorMessage String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
 }
 
 model ChatSession {

@@ -1,13 +1,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { Content } from "@google/generative-ai";
 import type { ILLMProvider, ChatMessage } from "../interfaces/provider.interface";
+import { env } from "../../../config/env.config";
 
 export class GeminiAdapter implements ILLMProvider {
     private client: GoogleGenerativeAI;
 
     constructor(apiKey?: string) {
         // Uses provided key, or falls back to env variable
-        const key = apiKey || process.env.GEMINI_API_KEY || "";
+        const key = apiKey || env.GEMINI_API_KEY || "";
         this.client = new GoogleGenerativeAI(key);
     }
 

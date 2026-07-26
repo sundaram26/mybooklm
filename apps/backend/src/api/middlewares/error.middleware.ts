@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
+import { env } from "../../config/env.config";
 
 export interface CustomError extends Error {
     statusCode?: number;
@@ -18,7 +19,7 @@ export const globalErrorHandler = (
     const statusCode = err.statusCode || 500;
     const message = err.message || "Internal Server Error";
     
-    if (process.env.NODE_ENV !== "production") {
+    if (env.NODE_ENV !== "production") {
         console.error(`[Error]: ${message}`, err.stack);
     }
     
@@ -26,6 +27,6 @@ export const globalErrorHandler = (
         success: false,
         message,
         errors: err.errors || [],
-        stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
+        stack: env.NODE_ENV === "production" ? undefined : err.stack,
     });
 };
