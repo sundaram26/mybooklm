@@ -37,10 +37,10 @@ export class S3FileStorage implements IFileStorage {
         }
     }
 
-    async uploadFile(localPath: string, destKey: string): Promise<string> {
+    async uploadFile(source: string | Buffer, destKey: string): Promise<string> {
         const client = await this.getClient();
         const { PutObjectCommand } = await import("@aws-sdk/client-s3");
-        const fileContent = await fs.readFile(localPath);
+        const fileContent = Buffer.isBuffer(source) ? source : await fs.readFile(source);
         
         await client.send(new PutObjectCommand({
             Bucket: this.bucket,

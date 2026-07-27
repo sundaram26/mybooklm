@@ -107,6 +107,7 @@ export class ChatController {
             parentId,       // Optional: ID of message to branch from
             apiKey,         // Optional: User's own LLM API key
             modelId,        // Optional: Model to use with apiKey (e.g. "gpt-4o", "gemini-2.0-flash")
+            llmSettings,    // Optional: Full custom LLM configuration settings
         } = req.body;
 
         if (!query) {
@@ -167,12 +168,20 @@ export class ChatController {
             }
         });
 
-        // Build synthesisOptions conditionally to satisfy exactOptionalPropertyTypes:
-        // optional keys must be fully absent (not set to undefined) when not provided.
+        // Merge legacy values (apiKey, modelId) with llmSettings if needed
+        let resolvedSettings = llmSettings;
+        if (!resolvedSettings && (apiKey || modelId)) {
+            resolvedSettings = {
+                geminiApiKey: apiKey,
+                geminiModelId: modelId,
+                activeProvider: "google"
+            };
+        }
+
+        // Build synthesisOptions
         const synthesisOptions: import("../../core/synthesis/synthesis.service").SynthesisOptions = {
             useHyde: useHyde as boolean,
-            ...(apiKey ? { customApiKey: apiKey as string } : {}),
-            ...(modelId ? { modelId: modelId as string } : {})
+            llmSettings: resolvedSettings
         };
 
         if (stream) {

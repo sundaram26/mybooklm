@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { DocumentController } from "../controllers/document.controller";
+import { StudioController } from "../controllers/studio.controller";
 import { documentUpload, imageUpload } from "../middlewares/upload.middleware";
 import { optionalAuth } from "../middlewares/auth.middleware";
 
@@ -32,5 +33,9 @@ documentRoutes.get("/:notebookId/documents", DocumentController.getNotebookDocum
 documentRoutes.get("/documents/:id", DocumentController.getDocument);
 documentRoutes.get("/documents/:id/view", DocumentController.viewFile);
 documentRoutes.delete("/:notebookId/documents/:id", DocumentController.deleteDocument);
+documentRoutes.get("/:notebookId/documents/:id/status", DocumentController.getDocumentStatus);
 documentRoutes.get("/:notebookId/retrieve", DocumentController.retrieveNotebookChunks);
 documentRoutes.post("/:notebookId/retrieve", DocumentController.retrieveNotebookChunks);
+
+// Studio features
+documentRoutes.post("/:notebookId/studio", StudioController.generate);

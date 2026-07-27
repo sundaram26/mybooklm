@@ -1,0 +1,273 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: var(--bg-canvas);
+  --color-canvas-subtle: var(--bg-canvas-subtle);
+  --color-surface: var(--bg-surface);
+  --color-surface-hover: var(--bg-surface-hover);
+  --color-surface-active: var(--bg-surface-active);
+  --color-card: var(--bg-card);
+  --color-card-hover: var(--bg-card-hover);
+
+  --color-accent-orange: var(--accent-orange);
+  --color-accent-orange-hover: var(--accent-orange-hover);
+  --color-accent-orange-light: var(--accent-orange-light);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+
+  --color-border-subtle: var(--border-subtle);
+  --color-border-medium: var(--border-medium);
+}
+
+/* ==========================================================================
+   DESIGN TOKENS — DARK (Default)
+   ========================================================================== */
+
+:root,
+[data-theme="dark"] {
+  --bg-canvas:        #0A0A0C;
+  --bg-canvas-subtle: #0F0F12;
+  --bg-surface:       #111115;
+  --bg-surface-hover: #18181D;
+  --bg-surface-active:#1F1F26;
+  --bg-card:          #141418;
+  --bg-card-hover:    #1A1A20;
+
+  --accent-orange:       #E8521F;
+  --accent-orange-hover: #CF4418;
+  --accent-orange-light: rgba(232, 82, 31, 0.12);
+  --accent-foreground:   #FFFFFF;
+
+  --text-primary:   #ECECEC;
+  --text-secondary: #9B9BA6;
+  --text-muted:     #6B6B78;
+  --text-subtle:    #46464F;
+  --text-inverse:   #0A0A0C;
+
+  --border-subtle:  #1C1C22;
+  --border-medium:  #28282F;
+  --border-hover:   #3A3A44;
+  --border-focus:   #E8521F;
+
+  --status-success-bg:   rgba(16, 185, 129, 0.08);
+  --status-success-text: #34D399;
+  --status-warning-bg:   rgba(245, 158, 11, 0.08);
+  --status-warning-text: #FBBF24;
+  --status-error-bg:     rgba(239, 68, 68, 0.08);
+  --status-error-text:   #F87171;
+  --status-info-bg:      rgba(99, 102, 241, 0.08);
+  --status-info-text:    #818CF8;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,0.7);
+
+  --sidebar-width:    220px;
+  --info-panel-width: 260px;
+  --radius-sm:  4px;
+  --radius-md:  6px;
+  --radius-lg:  8px;
+  --radius-xl:  12px;
+
+  --transition-fast:   120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================================================
+   DESIGN TOKENS — LIGHT
+   ========================================================================== */
+
+[data-theme="light"] {
+  --bg-canvas:        #F9F9FB;
+  --bg-canvas-subtle: #F3F3F6;
+  --bg-surface:       #FFFFFF;
+  --bg-surface-hover: #F5F5F8;
+  --bg-surface-active:#EBEBEF;
+  --bg-card:          #FFFFFF;
+  --bg-card-hover:    #F8F8FB;
+
+  --accent-orange:       #D94A18;
+  --accent-orange-hover: #C03E12;
+  --accent-orange-light: rgba(217, 74, 24, 0.08);
+  --accent-foreground:   #FFFFFF;
+
+  --text-primary:   #111113;
+  --text-secondary: #52525B;
+  --text-muted:     #71717A;
+  --text-subtle:    #A1A1AA;
+  --text-inverse:   #FFFFFF;
+
+  --border-subtle:  #E4E4E9;
+  --border-medium:  #D1D1D9;
+  --border-hover:   #A1A1AA;
+  --border-focus:   #D94A18;
+
+  --status-success-bg:   rgba(16, 185, 129, 0.06);
+  --status-success-text: #059669;
+  --status-warning-bg:   rgba(245, 158, 11, 0.06);
+  --status-warning-text: #D97706;
+  --status-error-bg:     rgba(239, 68, 68, 0.06);
+  --status-error-text:   #DC2626;
+  --status-info-bg:      rgba(99, 102, 241, 0.06);
+  --status-info-text:    #4F46E5;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,0.12);
+}
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   GLOBAL BASE
+   ========================================================================== */
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html, body {
+    height: 100%;
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    font-family: var(--font-sans, 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+}
+
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--bg-canvas);
+  overflow: hidden;
+}
+
+.app-main {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--bg-canvas);
+  min-width: 0;
+}
+
+/* ==========================================================================
+   BUTTONS — compact, enterprise-grade
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.btn-primary {
+  background-color: var(--accent-orange);
+  color: #fff;
+  border-color: transparent;
+}
+.btn-primary:hover {
+  background-color: var(--accent-orange-hover);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border-color: var(--border-subtle);
+}
+.btn-secondary:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-primary);
+  border-color: var(--border-medium);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--text-muted);
+  border-color: transparent;
+}
+.btn-ghost:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+/* ==========================================================================
+   MODAL
+   ========================================================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 150ms ease-out;
+}
+
+.modal-content {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 480px;
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 150ms ease-out;
+}

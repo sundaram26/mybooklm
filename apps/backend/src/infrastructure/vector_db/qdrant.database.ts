@@ -44,6 +44,26 @@ export class QdrantDatabase implements IVectorDatabase {
                     },
                 }),
             });
+
+            // Create Keyword payload index on notebookId
+            console.log(`Creating Qdrant payload index 'notebookId' on collection '${collectionName}'`);
+            await this.request(`/collections/${collectionName}/index`, {
+                method: "POST",
+                body: JSON.stringify({
+                    field_name: "notebookId",
+                    field_schema: "keyword"
+                })
+            }).catch(err => console.error("Failed to create Qdrant payload index for notebookId:", err));
+
+            // Create Keyword payload index on documentId
+            console.log(`Creating Qdrant payload index 'documentId' on collection '${collectionName}'`);
+            await this.request(`/collections/${collectionName}/index`, {
+                method: "POST",
+                body: JSON.stringify({
+                    field_name: "documentId",
+                    field_schema: "keyword"
+                })
+            }).catch(err => console.error("Failed to create Qdrant payload index for documentId:", err));
         }
     }
 

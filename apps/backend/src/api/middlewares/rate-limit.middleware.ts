@@ -1,23 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
-
-interface RateLimitStore {
-    tokens: number;
-    lastRefill: number;
-}
-
-// In-memory registry to store client rate limits
-const memoryStore = new Map<string, RateLimitStore>();
-
-// Cleanup stale records periodically to avoid memory leaks
-setInterval(() => {
-    const now = Date.now();
-    for (const [key, record] of memoryStore.entries()) {
-        // If bucket is fully refilled and hasn't been accessed for a long window, clean it up
-        if (now - record.lastRefill > 10 * 60 * 1000) {
-            memoryStore.delete(key);
-        }
-    }
-}, 5 * 60 * 1000).unref(); // .unref() ensures this timer does not block process exit
+import { Redis } from "ioredis";
+import { env } from "../../config/env.config";
 
 export interface RateLimitOptions {
     max: number;          // Maximum requests allowed within window
@@ -25,52 +8,62 @@ export interface RateLimitOptions {
     message?: string;     // Customized error message on rate limit breach
 }
 
+// Instantiate Redis client for rate limiting
+let redisClient: Redis | null = null;
+try {
+    redisClient = new Redis(env.REDIS_URL, {
+        maxRetriesPerRequest: 3,
+    });
+    redisClient.on("error", (err) => {
+        console.error("Redis rate limiter client error:", err);
+    });
+} catch (err) {
+    console.error("Failed to connect to Redis for rate-limiting:", err);
+}
+
 /**
- * Custom Token Bucket Rate Limiter middleware.
- * Guarantees high-performance, zero dependencies, and path-specific limits.
+ * Custom Redis-backed Rate Limiter middleware.
+ * Cluster-safe, high-performance, and handles Redis downtime gracefully.
  */
 export function createRateLimiter(options: RateLimitOptions) {
     const { max, windowMs, message = "Too many requests. Please try again later." } = options;
-    const refillRate = max / windowMs; // token refill rate per millisecond
 
-    return (req: Request, res: Response, next: NextFunction) => {
-        // Use client IP address or fallback
+    return async (req: Request, res: Response, next: NextFunction) => {
         const ip = req.ip || req.socket.remoteAddress || "global";
-        const key = `${req.path}-${ip}`;
+        const key = `rl:${req.path}-${ip}`;
 
-        const now = Date.now();
-        let record = memoryStore.get(key);
-
-        if (!record) {
-            record = {
-                tokens: max,
-                lastRefill: now
-            };
-            memoryStore.set(key, record);
-        } else {
-            // Refill tokens based on time elapsed since last request
-            const elapsed = now - record.lastRefill;
-            const refilled = elapsed * refillRate;
-            
-            record.tokens = Math.min(max, record.tokens + refilled);
-            record.lastRefill = now;
+        if (!redisClient) {
+            // Fallback: if Redis is unavailable, let the request proceed to avoid downtime
+            return next();
         }
 
-        // Consume a token if we have at least one token available
-        if (record.tokens >= 1) {
-            record.tokens -= 1;
-            memoryStore.set(key, record);
-            
+        try {
+            const current = await redisClient.incr(key);
+
+            if (current === 1) {
+                // Set TTL (convert ms to seconds, ensuring at least 1s)
+                await redisClient.expire(key, Math.max(1, Math.ceil(windowMs / 1000)));
+            }
+
+            const ttl = await redisClient.ttl(key);
+
             // Set rate limit headers for transparency
             res.setHeader("X-RateLimit-Limit", max);
-            res.setHeader("X-RateLimit-Remaining", Math.floor(record.tokens));
-            
+            res.setHeader("X-RateLimit-Remaining", Math.max(0, max - current));
+            res.setHeader("X-RateLimit-Reset", Math.ceil(Date.now() / 1000) + (ttl > 0 ? ttl : 0));
+
+            if (current > max) {
+                res.status(429).json({
+                    success: false,
+                    message
+                });
+                return;
+            }
+
             next();
-        } else {
-            res.status(429).json({
-                success: false,
-                message
-            });
+        } catch (error) {
+            console.error("[RateLimiter] Redis command failed, bypassing limit:", error);
+            next();
         }
     };
 }

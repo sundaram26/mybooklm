@@ -4,7 +4,7 @@ export interface IFileStorage {
      * @param localPath Temporary local path of the file
      * @param destKey Destination key or path in storage (e.g. 'documents/filename.pdf')
      */
-    uploadFile(localPath: string, destKey: string): Promise<string>;
+    uploadFile(source: string | Buffer, destKey: string): Promise<string>;
 
     /**
      * Downloads a file from storage as a buffer.

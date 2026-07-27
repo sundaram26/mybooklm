@@ -13,13 +13,17 @@ export class LocalFileStorage implements IFileStorage {
         await fs.mkdir(this.storageDir, { recursive: true });
     }
 
-    async uploadFile(localPath: string, destKey: string): Promise<string> {
+    async uploadFile(source: string | Buffer, destKey: string): Promise<string> {
         await this.ensureDir();
         const targetPath = path.join(this.storageDir, destKey);
         await fs.mkdir(path.dirname(targetPath), { recursive: true });
         
-        // Copy file to local storage location
-        await fs.copyFile(localPath, targetPath);
+        if (Buffer.isBuffer(source)) {
+            await fs.writeFile(targetPath, source);
+        } else {
+            // Copy file to local storage location
+            await fs.copyFile(source, targetPath);
+        }
         
         // Return public-facing route to the file
         return `/uploads/storage/${destKey}`;

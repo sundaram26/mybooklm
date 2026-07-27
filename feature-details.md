@@ -25,10 +25,10 @@ These keys and configurations drive RAG query optimization, HyDE documents, embe
 * **`OPENAI_API_KEY`** (OpenAI platform)
 * **`ANTHROPIC_API_KEY`** (Anthropic Console)
 
-You can also customize the exact model IDs used by the backend in your `.env` file:
-* **`GEMINI_MODEL`** (Optional, defaults to `"gemini-2.0-flash"`)
-* **`OPENAI_MODEL`** (Optional, defaults to `"gpt-4o-mini"`)
-* **`ANTHROPIC_MODEL`** (Optional, defaults to `"claude-3-5-haiku-20241022"`)
+You can customize default model tiers used by the backend in your `.env` file:
+* **`MINI_PROVIDER` & `MINI_MODEL`**: Model provider and name for Reranking and Query Optimization (Mini tasks).
+* **`MEDIUM_PROVIDER` & `MEDIUM_MODEL`**: Model provider and name for Grounded Chat (Medium tasks).
+* **`HIGH_PROVIDER` & `HIGH_MODEL`**: Model provider and name for Studio Briefings, Flashcards, and Audio Overviews (High reasoning tasks).
 
 ---
 

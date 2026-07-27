@@ -3,6 +3,7 @@ import { DocumentType } from "../../../generated/prisma/client";
 import { IngestionProcessor } from "./ingestion.processor";
 import { FileStorageFactory } from "../../infrastructure/file_storage/file-storage.factory";
 import { QdrantDatabase } from "../../infrastructure/vector_db/qdrant.database";
+import crypto from "crypto";
 
 export class DocumentService {
     /**
@@ -50,34 +51,53 @@ export class DocumentService {
     /**
      * Store a file document (PDF, Word, TXT, SRT, etc.)
      */
-    static async createFileDocument(notebookId: string, filePath: string, originalName: string, mimeType: string, fileSize?: number) {
+    static async createFileDocument(notebookId: string, source: string | Buffer, originalName: string, mimeType: string, fileSize?: number, relativePath?: string) {
+        const storage = FileStorageFactory.getStorage();
+        const docId = crypto.randomUUID();
+        const fileBaseName = originalName.replace(/\s+/g, "_");
+        const destKey = `${notebookId}/${docId}-${fileBaseName}`;
+
+        console.log(`[DocumentService] Uploading file to storage: ${destKey}`);
+        await storage.uploadFile(source, destKey);
+
         const doc = await prisma.notebookDocument.create({
             data: {
+                id: docId,
                 notebookId,
                 type: DocumentType.FILE,
-                url: filePath,
+                url: `storage://${destKey}`,
                 metadata: {
                     originalName,
                     mimeType,
-                    fileSize: fileSize || 0
+                    fileSize: fileSize || 0,
+                    relativePath: relativePath || undefined
                 }
             }
         });
 
         // Trigger background processing
-        IngestionProcessor.queueIngestion(doc.id);
+        IngestionProcessor.queueIngestion(doc.id).catch(err => console.error("[DocumentService] Ingestion enqueuing failed:", err));
         return doc;
     }
 
     /**
      * Store an image document
      */
-    static async createImageDocument(notebookId: string, filePath: string, originalName: string, mimeType: string, fileSize?: number) {
+    static async createImageDocument(notebookId: string, source: string | Buffer, originalName: string, mimeType: string, fileSize?: number) {
+        const storage = FileStorageFactory.getStorage();
+        const docId = crypto.randomUUID();
+        const fileBaseName = originalName.replace(/\s+/g, "_");
+        const destKey = `${notebookId}/${docId}-${fileBaseName}`;
+
+        console.log(`[DocumentService] Uploading image to storage: ${destKey}`);
+        await storage.uploadFile(source, destKey);
+
         const doc = await prisma.notebookDocument.create({
             data: {
+                id: docId,
                 notebookId,
                 type: DocumentType.IMAGE,
-                url: filePath,
+                url: `storage://${destKey}`,
                 metadata: {
                     originalName,
                     mimeType,
@@ -87,7 +107,7 @@ export class DocumentService {
         });
 
         // Trigger background processing
-        IngestionProcessor.queueIngestion(doc.id);
+        IngestionProcessor.queueIngestion(doc.id).catch(err => console.error("[DocumentService] Ingestion enqueuing failed:", err));
         return doc;
     }
 
@@ -108,7 +128,7 @@ export class DocumentService {
         });
 
         // Trigger background processing
-        IngestionProcessor.queueIngestion(doc.id);
+        IngestionProcessor.queueIngestion(doc.id).catch(err => console.error("[DocumentService] Ingestion enqueuing failed:", err));
         return doc;
     }
 
@@ -137,7 +157,7 @@ export class DocumentService {
         });
 
         // Trigger background processing
-        IngestionProcessor.queueIngestion(doc.id);
+        IngestionProcessor.queueIngestion(doc.id).catch(err => console.error("[DocumentService] Ingestion enqueuing failed:", err));
         return doc;
     }
 

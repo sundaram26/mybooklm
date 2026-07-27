@@ -2,24 +2,8 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-// Ensure the uploads directory exists
-const uploadsDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Set up local disk storage
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadsDir);
-    },
-    filename: (req, file, cb) => {
-        // Unique filename using timestamp + random suffix
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname);
-        cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-    }
-});
+// Set up in-memory storage
+const storage = multer.memoryStorage();
 
 // Document file filter (PDF, Word, TXT, SRT, VTT)
 const documentFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {

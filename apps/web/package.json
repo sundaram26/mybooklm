@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3000",
+    "dev": "next dev --webpack --port 3000",
     "build": "next build",
     "start": "next start",
     "lint": "eslint --max-warnings 0",
@@ -14,6 +14,7 @@
     "@repo/ui": "workspace:*",
     "@tailwindcss/postcss": "^4.3.3",
     "@tanstack/react-query": "^5.101.4",
+    "axios": "^1.18.1",
     "better-auth": "^1.6.25",
     "jimp": "^1.6.1",
     "lucide-react": "^1.27.0",

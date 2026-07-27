@@ -4,20 +4,19 @@ import { ParserFactory } from "./parsers/parser.factory";
 import { EmbeddingService } from "../embedding/embedding.service";
 import { QdrantDatabase } from "../../infrastructure/vector_db/qdrant.database";
 import cryptoModule from "crypto";
+import { Worker } from "bullmq";
+import { ingestionQueue, redisConnection } from "./queue";
 
 export class IngestionProcessor {
     private static qdrant = new QdrantDatabase();
     private static COLLECTION_NAME = "notebook_chunks";
-    private static queue: string[] = [];
-    private static activeWorkers = 0;
-    private static MAX_CONCURRENT_WORKERS = 2;
 
     /**
      * Queues a document for background ingestion.
      */
-    static queueIngestion(documentId: string): void {
-        this.queue.push(documentId);
-        this.processQueue();
+    static async queueIngestion(documentId: string): Promise<void> {
+        console.log(`[Ingestion] Enqueuing document ${documentId} in BullMQ`);
+        await ingestionQueue.add("ingest", { documentId });
     }
 
     /**
@@ -39,7 +38,7 @@ export class IngestionProcessor {
             if (stuckDocs.length > 0) {
                 console.log(`[Ingestion] Found ${stuckDocs.length} documents to recover.`);
                 for (const doc of stuckDocs) {
-                    this.queueIngestion(doc.id);
+                    await this.queueIngestion(doc.id);
                 }
             } else {
                 console.log("[Ingestion] No stuck documents found.");
@@ -49,26 +48,7 @@ export class IngestionProcessor {
         }
     }
 
-    private static async processQueue(): Promise<void> {
-        if (this.activeWorkers >= this.MAX_CONCURRENT_WORKERS || this.queue.length === 0) {
-            return;
-        }
-
-        const documentId = this.queue.shift()!;
-        this.activeWorkers++;
-        
-        try {
-            await this.processDocument(documentId);
-        } catch (error) {
-            console.error(`Queue worker failed for document ${documentId}:`, error);
-        } finally {
-            this.activeWorkers--;
-            // Recursively process next item in the queue
-            this.processQueue();
-        }
-    }
-
-    private static async processDocument(documentId: string): Promise<void> {
+    static async processDocument(documentId: string): Promise<void> {
         try {
             console.log(`[Ingestion] Starting ingestion for document: ${documentId}`);
             
@@ -94,25 +74,23 @@ export class IngestionProcessor {
             
             if (document.type === "FILE" || document.type === "IMAGE") {
                 if (!document.url) {
-                    throw new Error("No URL / file path found for file document.");
+                    throw new Error("No URL / storage path found for document.");
                 }
                 
-                // Upload raw file to persistent storage (Local or S3)
-                const storage = FileStorageFactory.getStorage();
-                const fileBaseName = document.url.split(/[/\\]/).pop() || "uploaded-file";
-                const destKey = `${document.notebookId}/${documentId}-${fileBaseName}`;
-                
-                console.log(`[Ingestion] Uploading raw file to storage: ${destKey}`);
-                await storage.uploadFile(document.url, destKey);
-                
-                // Save the provider-agnostic storage uri to document URL
-                await prisma.notebookDocument.update({
-                    where: { id: documentId },
-                    data: { url: `storage://${destKey}` }
-                });
-
-                source = document.url; // Use local path for parser to read
-                parserSource = document.url;
+                if (document.url.startsWith("storage://")) {
+                    const destKey = document.url.replace("storage://", "");
+                    const storage = FileStorageFactory.getStorage();
+                    
+                    console.log(`[Ingestion] Downloading source buffer from storage: ${destKey}`);
+                    const fileBuffer = await storage.downloadFile(destKey);
+                    
+                    source = fileBuffer;
+                    parserSource = destKey;
+                } else {
+                    // Fallback to legacy filepath if needed
+                    source = document.url;
+                    parserSource = document.url;
+                }
             } else if (document.type === "LINK") {
                 if (!document.url) {
                     throw new Error("No URL found for link document.");
@@ -200,3 +178,24 @@ export class IngestionProcessor {
         }
     }
 }
+
+export const ingestionWorker = new Worker(
+    "ingestion-queue",
+    async (job) => {
+        const { documentId } = job.data;
+        console.log(`[Ingestion Worker] Processing job ${job.id} for document ${documentId}`);
+        await IngestionProcessor.processDocument(documentId);
+    },
+    {
+        connection: redisConnection,
+        concurrency: 2
+    }
+);
+
+ingestionWorker.on("completed", (job) => {
+    console.log(`[Ingestion Worker] Job ${job.id} completed successfully`);
+});
+
+ingestionWorker.on("failed", (job, err) => {
+    console.error(`[Ingestion Worker] Job ${job?.id} failed with error:`, err);
+});

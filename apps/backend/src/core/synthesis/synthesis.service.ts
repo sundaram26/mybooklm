@@ -3,6 +3,8 @@ import { ProviderFactory } from "../../infrastructure/llm/providers/provider.fac
 import type { ChatMessage, ChatRole } from "../../infrastructure/llm/interfaces/provider.interface";
 import { env } from "../../config/env.config";
 import { SUPPORTED_MODELS } from "../../config/models";
+import { LLMManager } from "../../infrastructure/llm/llm-manager";
+import type { LLMConfig } from "../../infrastructure/llm/llm-manager";
 
 export interface SynthesisResponse {
     text: string;
@@ -12,75 +14,13 @@ export interface SynthesisResponse {
 export interface SynthesisOptions {
     useHyde?: boolean;
     limit?: number;
-    /**
-     * User's personal API key. Must be paired with modelId to route to the correct provider.
-     */
-    customApiKey?: string;
-    /**
-     * Model ID to use (e.g. "gpt-4o", "gemini-2.0-flash").
-     * When paired with customApiKey, bypasses server-side key detection entirely.
-     */
-    modelId?: string;
+    llmSettings?: LLMConfig | undefined;
 }
 
 export class SynthesisService {
 
-    /**
-     * Selects the LLM provider.
-     * Priority order:
-     *   1. If customApiKey + modelId are both given → use that exact model with the user's key.
-     *   2. If only customApiKey is given (no modelId) → treat it as a Gemini key (most common use-case).
-     *   3. Fall back to server-side configured keys (Gemini > OpenAI > Anthropic).
-     */
-    private static getLLM(customApiKey?: string, modelId?: string) {
-        // Case 1: User supplied both a key and a model — route directly, no server keys used
-        if (customApiKey && modelId) {
-            const modelConfig = SUPPORTED_MODELS[modelId];
-            if (modelConfig) {
-                return {
-                    provider: ProviderFactory.getProvider(modelId, customApiKey),
-                    modelId
-                };
-            }
-        }
-
-        // Case 2: User supplied only a key — treat as Gemini (most common)
-        if (customApiKey) {
-            return {
-                provider: ProviderFactory.getProvider(env.GEMINI_MODEL, customApiKey),
-                modelId: env.GEMINI_MODEL
-            };
-        }
-
-        // Case 3: Use server-configured keys
-        const geminiKey = env.GEMINI_API_KEY;
-        const openaiKey = env.OPENAI_API_KEY;
-        const anthropicKey = env.ANTHROPIC_API_KEY;
-
-        if (geminiKey && !geminiKey.includes("sample-gemini")) {
-            return {
-                provider: ProviderFactory.getProvider(env.GEMINI_MODEL),
-                modelId: env.GEMINI_MODEL
-            };
-        }
-        if (openaiKey && !openaiKey.includes("sample-openai")) {
-            return {
-                provider: ProviderFactory.getProvider(env.OPENAI_MODEL),
-                modelId: env.OPENAI_MODEL
-            };
-        }
-        if (anthropicKey && !anthropicKey.includes("sample-anthropic")) {
-            return {
-                provider: ProviderFactory.getProvider(env.ANTHROPIC_MODEL),
-                modelId: env.ANTHROPIC_MODEL
-            };
-        }
-
-        // Fallback default (will fail gracefully at the provider level if no key)
-        return {
-            provider: ProviderFactory.getProvider(env.GEMINI_MODEL),
-            modelId: env.GEMINI_MODEL
-        };
+    private static getLLM(settings?: LLMConfig) {
+        return LLMManager.getLLM(settings, "medium");
     }
 
     /**
@@ -139,7 +79,8 @@ ${formattedSources}
         console.log(`[Synthesis] Retrieving sources for RAG chat session in notebook: ${notebookId}`);
         const sources = await RetrievalService.retrieve(notebookId, query, {
             useHyde: options.useHyde,
-            limit
+            limit,
+            llmSettings: options.llmSettings
         });
 
         if (sources.length === 0) {
@@ -152,8 +93,8 @@ ${formattedSources}
         // 2. Prepare grounded messages list
         const messages = this.prepareMessages(query, history, sources);
 
-        // 3. Call LLM — pass both customApiKey and modelId so provider routing is correct
-        const llm = this.getLLM(options.customApiKey, options.modelId);
+        // 3. Call LLM
+        const llm = this.getLLM(options.llmSettings);
         console.log(`[Synthesis] Generating grounded answer using LLM: ${llm.modelId}`);
         const responseText = await llm.provider.generateText(llm.modelId, messages);
 
@@ -176,7 +117,8 @@ ${formattedSources}
         console.log(`[Synthesis] Retrieving sources for streaming RAG in notebook: ${notebookId}`);
         const sources = await RetrievalService.retrieve(notebookId, query, {
             useHyde: options.useHyde,
-            limit
+            limit,
+            llmSettings: options.llmSettings
         });
 
         if (sources.length === 0) {
@@ -193,8 +135,8 @@ ${formattedSources}
         // 2. Prepare grounded messages list
         const messages = this.prepareMessages(query, history, sources);
 
-        // 3. Stream from LLM — pass both customApiKey and modelId so provider routing is correct
-        const llm = this.getLLM(options.customApiKey, options.modelId);
+        // 3. Stream from LLM
+        const llm = this.getLLM(options.llmSettings);
         console.log(`[Synthesis] Streaming grounded answer from LLM: ${llm.modelId}`);
         const textStream = llm.provider.streamText(llm.modelId, messages);
 

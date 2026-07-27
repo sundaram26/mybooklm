@@ -19,9 +19,11 @@ export const globalErrorHandler = (
     const statusCode = err.statusCode || 500;
     const message = err.message || "Internal Server Error";
     
-    if (env.NODE_ENV !== "production") {
-        console.error(`[Error]: ${message}`, err.stack);
-    }
+    console.error(`[API Error] ${req.method} ${req.originalUrl}:`, {
+        status: statusCode,
+        message,
+        stack: err.stack,
+    });
     
     res.status(statusCode).json({
         success: false,

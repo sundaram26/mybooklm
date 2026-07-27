@@ -46,7 +46,12 @@ export class NotebookController {
             where: {
                 OR: conditions
             },
-            orderBy: { updatedAt: "desc" }
+            orderBy: { updatedAt: "desc" },
+            include: {
+                _count: {
+                    select: { documents: true }
+                }
+            }
         });
 
         res.status(200).json({ success: true, data: notebooks });
@@ -54,15 +59,34 @@ export class NotebookController {
 
     static getNotebook = asyncHandler(async (req: Request, res: Response) => {
         const id = req.params.id as string;
-        const notebook = await prisma.notebook.findUnique({
-            where: { id },
+        const userId = res.locals.user?.id as string | undefined;
+        const guestId = req.query.guestId as string | undefined;
+
+        const conditions: any[] = [];
+        if (userId) {
+            conditions.push({ userId });
+        }
+        if (guestId) {
+            conditions.push({ guestId });
+        }
+
+        if (conditions.length === 0) {
+            res.status(401).json({ success: false, message: "Unauthorized. Session required." });
+            return;
+        }
+
+        const notebook = await prisma.notebook.findFirst({
+            where: {
+                id,
+                OR: conditions
+            },
             include: {
                 documents: true
             }
         });
 
         if (!notebook) {
-            res.status(404).json({ success: false, message: "Notebook not found" });
+            res.status(404).json({ success: false, message: "Notebook not found or access denied." });
             return;
         }
 
@@ -79,7 +103,28 @@ export class NotebookController {
 
     static updateNotebook = asyncHandler(async (req: Request, res: Response) => {
         const id = req.params.id as string;
-        const { title } = req.body;
+        const { title, guestId } = req.body;
+        const userId = res.locals.user?.id as string | undefined;
+        const queryGuestId = req.query.guestId as string | undefined;
+        const resolvedGuestId = guestId || queryGuestId;
+
+        const conditions: any[] = [];
+        if (userId) conditions.push({ userId });
+        if (resolvedGuestId) conditions.push({ guestId: resolvedGuestId });
+
+        if (conditions.length === 0) {
+            res.status(401).json({ success: false, message: "Unauthorized." });
+            return;
+        }
+
+        const existing = await prisma.notebook.findFirst({
+            where: { id, OR: conditions }
+        });
+
+        if (!existing) {
+            res.status(404).json({ success: false, message: "Notebook not found or access denied." });
+            return;
+        }
 
         if (!title) {
             res.status(400).json({ success: false, message: "Title is required for rename." });
@@ -96,14 +141,25 @@ export class NotebookController {
 
     static deleteNotebook = asyncHandler(async (req: Request, res: Response) => {
         const id = req.params.id as string;
+        const userId = res.locals.user?.id as string | undefined;
+        const resolvedGuestId = req.query.guestId || req.cookies?.guestId;
 
-        const notebook = await prisma.notebook.findUnique({
-            where: { id },
+        const conditions: any[] = [];
+        if (userId) conditions.push({ userId });
+        if (resolvedGuestId) conditions.push({ guestId: resolvedGuestId });
+
+        if (conditions.length === 0) {
+            res.status(401).json({ success: false, message: "Unauthorized." });
+            return;
+        }
+
+        const notebook = await prisma.notebook.findFirst({
+            where: { id, OR: conditions },
             include: { documents: true }
         });
 
         if (!notebook) {
-            res.status(404).json({ success: false, message: "Notebook not found" });
+            res.status(404).json({ success: false, message: "Notebook not found or access denied." });
             return;
         }
 

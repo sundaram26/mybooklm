@@ -2,6 +2,7 @@ import express from "express";
 import type { Request, Response } from "express";
 import path from "path";
 import { json } from "body-parser";
+import cors from "cors";
 import { env } from "./config/env.config";
 import { auth } from "./infrastructure/auth/auth";
 import { toNodeHandler } from "better-auth/node";
@@ -11,10 +12,14 @@ import { globalErrorHandler } from "./api/middlewares/error.middleware";
 import { notebookRoutes } from "./api/routes/notebook.routes";
 import { documentRoutes } from "./api/routes/document.routes";
 import { chatRoutes } from "./api/routes/chat.routes";
-import { IngestionProcessor } from "./core/ingestion/ingestion.processor";
+import { IngestionProcessor, ingestionWorker } from "./core/ingestion/ingestion.processor";
 import { createRateLimiter } from "./api/middlewares/rate-limit.middleware";
 
 const app = express();
+app.use(cors({
+    origin: ["http://localhost:3000", "http://127.0.0.1:3000", "http://192.168.0.105:3000"],
+    credentials: true,
+}));
 app.use(json());
 
 // Auth handlers (Express 5 named wildcard syntax + proxy header normalization)
@@ -34,9 +39,9 @@ app.all("/api/auth/*path", (req, res) => {
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Rate Limiters
-const standardLimit = createRateLimiter({ max: 100, windowMs: 60 * 1000 }); // General CRUD
-const chatLimit = createRateLimiter({ max: 20, windowMs: 60 * 1000 });       // Grounded Synthesis
-const ingestLimit = createRateLimiter({ max: 10, windowMs: 60 * 1000 });     // Ingestions
+const standardLimit = createRateLimiter({ max: 500, windowMs: 60 * 1000 }); // General CRUD
+const chatLimit = createRateLimiter({ max: 50, windowMs: 60 * 1000 });       // Grounded Synthesis
+const ingestLimit = createRateLimiter({ max: 300, windowMs: 60 * 1000 });     // Ingestions & Polling
 
 // Mount Routes under /api/notebooks
 app.use("/api/notebooks", standardLimit, notebookRoutes);

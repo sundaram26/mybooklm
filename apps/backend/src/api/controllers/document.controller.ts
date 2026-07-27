@@ -21,12 +21,15 @@ export class DocumentController {
             return;
         }
 
+        const relativePath = req.body.relativePath as string | undefined;
+
         const document = await DocumentService.createFileDocument(
             notebookId, 
-            file.path, 
+            file.buffer, 
             file.originalname, 
             file.mimetype,
-            file.size
+            file.size,
+            relativePath
         );
         
         res.status(201).json({ success: true, data: document });
@@ -49,7 +52,7 @@ export class DocumentController {
 
         const document = await DocumentService.createImageDocument(
             notebookId, 
-            file.path, 
+            file.buffer, 
             file.originalname, 
             file.mimetype,
             file.size
@@ -90,13 +93,18 @@ export class DocumentController {
         const notebookId = req.params.notebookId as string;
         const documents = await DocumentService.getNotebookDocuments(notebookId);
         
-        const mappedDocuments = documents.map((doc: any) => ({
-            ...doc,
-            fileSize: (doc.metadata as any)?.fileSize || 0,
-            viewUrl: doc.url?.startsWith("storage://")
-                ? `/api/notebooks/documents/${doc.id}/view`
-                : doc.url
-        }));
+        const mappedDocuments = documents.map((doc: any) => {
+            const meta = (doc.metadata as any) || {};
+            return {
+                ...doc,
+                title: meta.originalName || meta.title || meta.noteTitle || "Untitled Document",
+                relativePath: meta.relativePath,
+                fileSize: meta.fileSize || 0,
+                viewUrl: doc.url?.startsWith("storage://")
+                    ? `/api/notebooks/documents/${doc.id}/view`
+                    : doc.url
+            };
+        });
         
         res.status(200).json({ success: true, data: mappedDocuments });
     });
@@ -110,15 +118,36 @@ export class DocumentController {
             return;
         }
         
+        const meta = (document.metadata as any) || {};
         const mappedDocument = {
             ...document,
-            fileSize: (document.metadata as any)?.fileSize || 0,
+            title: meta.originalName || meta.title || meta.noteTitle || "Untitled Document",
+            relativePath: meta.relativePath,
+            fileSize: meta.fileSize || 0,
             viewUrl: document.url?.startsWith("storage://")
                 ? `/api/notebooks/documents/${document.id}/view`
                 : document.url
         };
         
         res.status(200).json({ success: true, data: mappedDocument });
+    });
+
+    static getDocumentStatus = asyncHandler(async (req: Request, res: Response) => {
+        const id = req.params.id as string;
+        const document = await DocumentService.getDocumentById(id);
+        
+        if (!document) {
+            res.status(404).json({ success: false, message: "Document not found" });
+            return;
+        }
+        
+        res.status(200).json({ 
+            success: true, 
+            data: { 
+                status: document.status, 
+                errorMessage: document.errorMessage || undefined 
+            } 
+        });
     });
 
     static retrieveNotebookChunks = asyncHandler(async (req: Request, res: Response) => {

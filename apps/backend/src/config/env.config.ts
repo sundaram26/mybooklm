@@ -26,14 +26,20 @@ const envSchema = z.object({
   OPENAI_API_KEY: z.string().optional(),
   ANTHROPIC_API_KEY: z.string().optional(),
   GEMINI_API_KEY: z.string().optional(),
+  OPENROUTER_API_KEY: z.string().optional(),
   BACKBLAZE_B2_ENDPOINT: z.string().optional(), // Marked optional string since local storage requires no endpoint
   AWS_S3_BUCKET: z.string().optional(),
   AWS_ACCESS_KEY_ID: z.string().optional(),
   AWS_SECRET_ACCESS_KEY: z.string().optional(),
   AWS_REGION: z.string().optional(),
-  GEMINI_MODEL: z.string().default("gemini-2.0-flash"),
-  OPENAI_MODEL: z.string().default("gpt-4o-mini"),
-  ANTHROPIC_MODEL: z.string().default("claude-3-5-haiku-20241022"),
+  OPENROUTER_BASE_URL: z.string().optional(),
+  REDIS_URL: z.string().url().default("redis://127.0.0.1:6379"),
+  MINI_PROVIDER: z.string().default("default"),
+  MINI_MODEL: z.string().default(""),
+  MEDIUM_PROVIDER: z.string().default("default"),
+  MEDIUM_MODEL: z.string().default(""),
+  HIGH_PROVIDER: z.string().default("default"),
+  HIGH_MODEL: z.string().default(""),
 });
 
 
