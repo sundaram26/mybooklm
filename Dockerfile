@@ -8,7 +8,7 @@ RUN corepack enable
 
 COPY . .
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 RUN cd apps/backend && pnpm prisma generate
 
