@@ -114,7 +114,7 @@ export class SrtParser implements IDocumentParser {
                 const textChunks = await splitter.splitText(fullText);
                 return {
                     rawText: fullText,
-                    chunks: textChunks.map(c => ({ text: c, metadata: {} }))
+                    chunks: textChunks.map((c: string) => ({ text: c, metadata: {} }))
                 };
             }
         }

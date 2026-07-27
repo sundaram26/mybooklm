@@ -30,4 +30,4 @@ WORKDIR /app/apps/backend
 
 EXPOSE 8080
 
-CMD ["node","dist/src/app.js"]
+CMD ["node","dist/app.js"]

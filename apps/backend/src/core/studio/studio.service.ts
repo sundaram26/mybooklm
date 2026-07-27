@@ -64,7 +64,7 @@ export class StudioService {
         
         let context = "";
         if (chunks.length > 0) {
-            context = chunks.map((chunk, idx) => {
+            context = chunks.map((chunk: any, idx: number) => {
                 const docTitle = chunk.metadata?.title || chunk.metadata?.originalName || chunk.metadata?.sourceUrl || `Source ${idx + 1}`;
                 return `--- START OF EXCERPT [${idx + 1}]: ${docTitle} ---\n${chunk.text}\n--- END OF EXCERPT [${idx + 1}] ---`;
             }).join("\n\n");
