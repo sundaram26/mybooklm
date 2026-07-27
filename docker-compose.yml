@@ -1,0 +1,71 @@
+services:
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: noetalm-backend
+
+    restart: unless-stopped
+
+    env_file:
+      - .env.production
+
+    depends_on:
+      - db
+      - redis
+      - qdrant
+
+    ports:
+      - "127.0.0.1:8080:8080"
+
+    networks:
+      - app-network
+
+  db:
+    image: postgres:16-alpine
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: notebooklm
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+
+    restart: unless-stopped
+
+    volumes:
+      - redis_data:/data
+
+    networks:
+      - app-network
+
+  qdrant:
+    image: qdrant/qdrant:latest
+
+    restart: unless-stopped
+
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  qdrant_data:
+
+networks:
+  app-network:
+    external: true
