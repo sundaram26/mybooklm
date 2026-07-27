@@ -6,6 +6,7 @@ export interface ParsedChunk {
 export interface ParsedDocument {
     rawText: string;
     chunks: ParsedChunk[];
+    metadata?: Record<string, any>;
 }
 
 export interface IDocumentParser {

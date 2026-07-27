@@ -40,6 +40,8 @@ const envSchema = z.object({
   MEDIUM_MODEL: z.string().default(""),
   HIGH_PROVIDER: z.string().default("default"),
   HIGH_MODEL: z.string().default(""),
+  EMBEDDING_PROVIDER: z.string().default("default"),
+  EMBEDDING_MODEL: z.string().default(""),
 });
 
 

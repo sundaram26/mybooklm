@@ -3,13 +3,13 @@ import type { IDocumentParser, ParsedDocument, ParsedChunk } from "./parser.inte
 
 export class YoutubeParser implements IDocumentParser {
     
-    private extractVideoId(url: string): string | null {
+    extractVideoId(url: string): string | null {
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
         const match = url.match(regExp);
         return (match && match[2]?.length === 11) ? match[2] : null;
     }
 
-    private extractPlaylistId(url: string): string | null {
+    extractPlaylistId(url: string): string | null {
         const regExp = /[?&]list=([^#\&\?]+)/;
         const match = url.match(regExp);
         return match ? match[1] || null : null;
@@ -41,11 +41,66 @@ export class YoutubeParser implements IDocumentParser {
         }
     }
 
-    async parse(source: string): Promise<ParsedDocument> {
+    async getPlaylistDetails(url: string): Promise<{ videoIds: string[], title: string }> {
+        const playlistId = this.extractPlaylistId(url);
+        if (!playlistId) throw new Error("Invalid playlist URL");
+
+        const playlistUrl = `https://www.youtube.com/playlist?list=${playlistId}`;
+        try {
+            const response = await fetch(playlistUrl, {
+                headers: {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+                }
+            });
+            const html = await response.text();
+            
+            const videoIds = new Set<string>();
+            const regex = /"videoId":"([a-zA-Z0-9_-]{11})"/g;
+            let match;
+            while ((match = regex.exec(html)) !== null) {
+                if (match[1]) videoIds.add(match[1]);
+            }
+
+            const titleMatch = html.match(/<title>(.*?) - YouTube<\/title>/);
+            const title = titleMatch ? titleMatch[1] : `YouTube Playlist (${playlistId})`;
+
+            return { videoIds: Array.from(videoIds), title: title || `YouTube Playlist (${playlistId})` };
+        } catch (error) {
+            console.error(`Failed to fetch playlist details:`, error);
+            return { videoIds: [], title: `YouTube Playlist (${playlistId})` };
+        }
+    }
+
+    async getVideoTitle(videoId: string): Promise<string> {
+        try {
+            const response = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
+                headers: {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+                }
+            });
+            const html = await response.text();
+            const titleMatch = html.match(/<title>(.*?) - YouTube<\/title>/);
+            return titleMatch ? titleMatch[1]! : `YouTube Video (${videoId})`;
+        } catch (error) {
+            return `YouTube Video (${videoId})`;
+        }
+    }
+
+    async parse(source: string, options?: Record<string, any>): Promise<ParsedDocument> {
+        const onProgress = options?.onProgress as ((progress: number, message: string) => void) | undefined;
+        const reportProgress = (progress: number, message: string) => {
+            if (onProgress) {
+                try { onProgress(progress, message); } catch (e) { /* ignore */ }
+            }
+        };
+
         const playlistId = this.extractPlaylistId(source);
         let videoIds: string[] = [];
 
         if (playlistId) {
+            // Note: Since we are exploding playlists in IngestionProcessor, this block shouldn't ideally be hit for playlists anymore.
+            // But we keep it for backward compatibility or direct calls.
+            reportProgress(5, `Extracting videos from YouTube playlist...`);
             console.log(`Processing YouTube playlist ID: ${playlistId}`);
             videoIds = await this.getVideoIdsFromPlaylist(playlistId);
         } else {
@@ -61,10 +116,15 @@ export class YoutubeParser implements IDocumentParser {
 
         let totalRawText = "";
         const allChunks: ParsedChunk[] = [];
+        const totalVideos = videoIds.length;
 
-        for (const videoId of videoIds) {
+        for (let idx = 0; idx < totalVideos; idx++) {
+            const videoId = videoIds[idx]!;
             try {
+                const progressPct = Math.round(10 + (idx / totalVideos) * 70); // 10% to 80% for fetching transcripts
+                reportProgress(progressPct, `Fetching transcript for video ${idx + 1} of ${totalVideos}...`);
                 console.log(`Fetching transcript for YouTube video: ${videoId}`);
+                
                 const transcript = await YoutubeTranscript.fetchTranscript(videoId);
                 
                 if (!transcript || transcript.length === 0) {
@@ -116,10 +176,20 @@ export class YoutubeParser implements IDocumentParser {
         if (allChunks.length === 0) {
             throw new Error(`Failed to load transcripts for YouTube URL: ${source}`);
         }
+        
+        let parsedTitle = "";
+        if (totalVideos === 1) {
+            parsedTitle = await this.getVideoTitle(videoIds[0]!);
+        }
+        
+        reportProgress(85, "Finished fetching transcripts.");
 
         return {
             rawText: totalRawText,
-            chunks: allChunks
+            chunks: allChunks,
+            metadata: {
+                title: parsedTitle || undefined
+            }
         };
     }
 }

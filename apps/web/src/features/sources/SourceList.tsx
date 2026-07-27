@@ -28,8 +28,8 @@ export function SourceList() {
       let hasChanges = false;
       for (const doc of pendingDocs) {
         try {
-          const { status } = await api.getDocumentStatus(notebookId, doc.id);
-          if (status !== doc.status) {
+          const { status, progressMessage } = await api.getDocumentStatus(notebookId, doc.id);
+          if (status !== doc.status || progressMessage !== doc.progressMessage) {
             hasChanges = true;
           }
         } catch {
@@ -50,7 +50,8 @@ export function SourceList() {
     return <FileText size={18} style={{ color: "var(--status-info-text)" }} />;
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (doc: DocumentItem) => {
+    const { status, progressMessage } = doc;
     if (status === "COMPLETED") {
       return (
         <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2px 8px", borderRadius: "999px", backgroundColor: "var(--status-success-bg)", color: "var(--status-success-text)", fontSize: "0.72rem", fontWeight: "600" }}>
@@ -61,9 +62,9 @@ export function SourceList() {
     }
     if (status === "PROCESSING" || status === "PENDING") {
       return (
-        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2px 8px", borderRadius: "999px", backgroundColor: "var(--status-warning-bg)", color: "var(--status-warning-text)", fontSize: "0.72rem", fontWeight: "600" }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2px 8px", borderRadius: "999px", backgroundColor: "var(--status-warning-bg)", color: "var(--status-warning-text)", fontSize: "0.72rem", fontWeight: "600" }} title={progressMessage || "Processing..."}>
           <RefreshCw size={12} className="spin" />
-          Processing
+          {progressMessage ? progressMessage.slice(0, 30) + (progressMessage.length > 30 ? '...' : '') : "Processing"}
         </span>
       );
     }
@@ -131,10 +132,11 @@ export function SourceList() {
                   <span style={{ fontSize: "0.92rem", fontWeight: "600", color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {doc.title}
                   </span>
-                  {getStatusBadge(doc.status)}
+                  {getStatusBadge(doc)}
                 </div>
 
                 <span style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginTop: "2px" }}>
+                  {doc.relativePath && <span style={{ fontWeight: 500, color: "var(--text-secondary)" }}>{doc.relativePath} • </span>}
                   {doc.type} • {doc.fileSize ? `${(doc.fileSize / 1024).toFixed(1)} KB` : "Text note"} • {new Date(doc.createdAt).toLocaleDateString()}
                 </span>
               </div>

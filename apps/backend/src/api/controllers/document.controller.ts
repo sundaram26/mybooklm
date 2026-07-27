@@ -100,6 +100,9 @@ export class DocumentController {
                 title: meta.originalName || meta.title || meta.noteTitle || "Untitled Document",
                 relativePath: meta.relativePath,
                 fileSize: meta.fileSize || 0,
+                progress: meta.progress,
+                progressMessage: meta.progressMessage,
+                studioFeature: meta.studioFeature,
                 viewUrl: doc.url?.startsWith("storage://")
                     ? `/api/notebooks/documents/${doc.id}/view`
                     : doc.url
@@ -124,6 +127,7 @@ export class DocumentController {
             title: meta.originalName || meta.title || meta.noteTitle || "Untitled Document",
             relativePath: meta.relativePath,
             fileSize: meta.fileSize || 0,
+            studioFeature: meta.studioFeature,
             viewUrl: document.url?.startsWith("storage://")
                 ? `/api/notebooks/documents/${document.id}/view`
                 : document.url
@@ -141,11 +145,15 @@ export class DocumentController {
             return;
         }
         
+        const meta = (document.metadata as Record<string, any>) || {};
+        
         res.status(200).json({ 
             success: true, 
             data: { 
                 status: document.status, 
-                errorMessage: document.errorMessage || undefined 
+                errorMessage: document.errorMessage || undefined,
+                progress: meta.progress,
+                progressMessage: meta.progressMessage
             } 
         });
     });

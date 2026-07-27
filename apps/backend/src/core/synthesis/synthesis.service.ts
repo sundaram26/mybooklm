@@ -49,7 +49,7 @@ Your goal is to answer the user's query using ONLY the provided source chunks.
 
 CRITICAL RULES:
 1. Base your answer strictly on the provided source chunks. Do not assume or extrapolate. If the context does not contain the answer, say "I cannot find the answer in the provided documents."
-2. Cite your sources inline using [1], [2], etc., corresponding to the sources list below. Never invent citations.
+2. Cite your sources inline. In your inline citations, you MUST include the exact source locator if present (e.g. "[1 (Timestamp 45s)]" or "[2 (Page 4)]" or "[3]") so the user knows exactly where in the file or video the information resides.
 3. Every claim you make MUST be backed by a source citation.
 4. Keep your formatting clean, readable, and professional.
 

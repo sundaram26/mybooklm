@@ -12,6 +12,9 @@ export interface DocumentItem {
   fileSize?: number;
   relativePath?: string;
   errorMessage?: string;
+  progress?: number;
+  progressMessage?: string;
+  studioFeature?: string;
   createdAt: string;
 }
 
@@ -76,7 +79,7 @@ export const documentsApi = {
   async getDocumentStatus(
     notebookId: string,
     documentId: string
-  ): Promise<{ status: string; errorMessage?: string }> {
+  ): Promise<{ status: string; errorMessage?: string; progress?: number; progressMessage?: string }> {
     const response = await axiosClient.get(`/notebooks/${notebookId}/documents/${documentId}/status`);
     return response.data?.data;
   },
@@ -93,12 +96,13 @@ export const documentsApi = {
   async generateStudioOutput(
     notebookId: string,
     feature: string,
-    options?: { llmSettings?: LLMConfig }
+    options?: { llmSettings?: LLMConfig; customParams?: Record<string, any> }
   ): Promise<DocumentItem> {
     try {
       const response = await axiosClient.post(`/notebooks/${notebookId}/studio`, {
         feature,
         llmSettings: options?.llmSettings,
+        customParams: options?.customParams,
       });
       return response.data?.data;
     } catch (err: any) {

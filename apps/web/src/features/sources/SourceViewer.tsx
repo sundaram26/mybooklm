@@ -46,6 +46,13 @@ export function SourceViewer() {
   const { data: doc, isLoading, error } = useDocument(documentId ? documentId : null);
   const deleteDocMutation = useDeleteDocument(notebookId);
 
+  React.useEffect(() => {
+    if (error) {
+      console.warn("Failed to load document, closing viewer", error);
+      setSelectedDocumentId(null);
+    }
+  }, [error, setSelectedDocumentId]);
+
   const handleClose = () => {
     setSelectedDocumentId(null);
   };

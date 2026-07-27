@@ -32,6 +32,15 @@ export function ChatInterface({ notebookId }: { notebookId: string }) {
         }
         return dbHistory;
       });
+      // Set activeParentId to the last message ID in database history
+      if (dbHistory.length > 0) {
+        const lastMsg = dbHistory[dbHistory.length - 1];
+        if (lastMsg) {
+          setActiveParentId(lastMsg.id);
+        }
+      } else {
+        setActiveParentId(undefined);
+      }
     }
   }, [dbHistory, isStreaming]);
 
@@ -57,7 +66,15 @@ export function ChatInterface({ notebookId }: { notebookId: string }) {
         notebookId, queryText,
         { parentId: activeParentId, llmSettings },
         chunk => setMessages(prev => prev.map(m => m.id === tempAssistant.id ? { ...m, content: m.content + chunk } : m)),
-        () => { setIsStreaming(false); setActiveParentId(tempAssistant.id); queryClient.invalidateQueries({ queryKey: ["chatHistory", notebookId] }); },
+        (fullText, metadata) => {
+          setIsStreaming(false);
+          if (metadata?.messageId) {
+            setActiveParentId(metadata.messageId);
+          } else {
+            setActiveParentId(tempAssistant.id);
+          }
+          queryClient.invalidateQueries({ queryKey: ["chatHistory", notebookId] });
+        },
         err => { setIsStreaming(false); setMessages(prev => prev.map(m => m.id === tempAssistant.id ? { ...m, content: `Error: ${err.message}` } : m)); }
       );
     } catch (err: any) {

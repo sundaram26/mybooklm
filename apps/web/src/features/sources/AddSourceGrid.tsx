@@ -41,6 +41,7 @@ export function AddSourceGrid() {
 
   // Active form view: null (show grid), or one of the form names
   const [activeForm, setActiveForm] = useState<"pdf" | "yt" | "text" | "vtt" | "web" | null>(null);
+  const [subtitlePreference, setSubtitlePreference] = useState<"srt" | "vtt" | "both">("both");
   
   // States for different inputs
   const [file, setFile] = useState<File | null>(null);
@@ -57,6 +58,7 @@ export function AddSourceGrid() {
     setUrlTitle("");
     setNoteTitle("");
     setNoteContent("");
+    setSubtitlePreference("both");
     setError(null);
     setLoading(false);
   };
@@ -302,6 +304,33 @@ export function AddSourceGrid() {
 
           {activeForm === "vtt" && (
             <div className="flex flex-col gap-6">
+              {/* Subtitle Preference Toggles */}
+              <div className="flex flex-col gap-2 mb-2">
+                <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wide">
+                  Choose format to import from folder:
+                </label>
+                <div className="flex gap-2">
+                  {[
+                    { value: "srt", label: "SRT (.srt) Only" },
+                    { value: "vtt", label: "VTT (.vtt) Only" },
+                    { value: "both", label: "Both Formats" }
+                  ].map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setSubtitlePreference(opt.value as any)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                        subtitlePreference === opt.value
+                          ? "bg-accent-orange/15 border-accent-orange text-accent-orange"
+                          : "bg-[var(--bg-canvas)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface-hover)]"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="border-2 border-dashed border-[var(--border-medium)] bg-[var(--bg-canvas-subtle)] rounded-2xl p-10 text-center relative group hover:border-accent-orange/40 transition-colors">
                 <input 
                   type="file"
@@ -316,14 +345,25 @@ export function AddSourceGrid() {
                     setLoading(true);
                     setError(null);
                     try {
-                      // Filter out macOS hidden metadata files (._*) and only accept true .vtt and .srt files
+                      // Filter out macOS hidden metadata files (._*) and respect subtitlePreference
                       const validFiles = Array.from(files).filter(f => {
                         const isHiddenMacFile = f.name.startsWith('._') || (f.webkitRelativePath && f.webkitRelativePath.includes('__MACOSX'));
-                        const isSubtitle = f.name.endsWith('.vtt') || f.name.endsWith('.srt');
+                        
+                        let isSubtitle = false;
+                        if (subtitlePreference === "srt") {
+                          isSubtitle = f.name.endsWith('.srt');
+                        } else if (subtitlePreference === "vtt") {
+                          isSubtitle = f.name.endsWith('.vtt');
+                        } else {
+                          isSubtitle = f.name.endsWith('.vtt') || f.name.endsWith('.srt');
+                        }
+                        
                         return isSubtitle && !isHiddenMacFile;
                       });
                       
-                      if (validFiles.length === 0) throw new Error("No valid .vtt or .srt files found in this folder");
+                      if (validFiles.length === 0) {
+                        throw new Error(`No valid ${subtitlePreference === "both" ? ".vtt or .srt" : "." + subtitlePreference} files found in this folder`);
+                      }
                       for (const file of validFiles) {
                         await uploadFileMutation.mutateAsync(file);
                       }
@@ -343,7 +383,7 @@ export function AddSourceGrid() {
                     <Upload size={36} className="text-accent-orange opacity-75 group-hover:opacity-100 transition-opacity" />
                   )}
                   <span className="text-[0.92rem] font-bold text-[var(--text-primary)] mt-1">
-                    {loading ? "Uploading transcript folder..." : "Select subtitle folder"}
+                    {loading ? "Uploading transcript folder..." : `Select subtitle folder (${subtitlePreference === "both" ? "srt & vtt" : subtitlePreference})`}
                   </span>
                   <span className="text-[0.74rem] text-[var(--text-muted)]">
                     Pick a folder containing subtitle files (.vtt, .srt)

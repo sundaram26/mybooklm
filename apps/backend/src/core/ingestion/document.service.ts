@@ -114,7 +114,7 @@ export class DocumentService {
     /**
      * Store raw text content
      */
-    static async createTextDocument(notebookId: string, content: string, title?: string) {
+    static async createTextDocument(notebookId: string, content: string, title?: string, customMetadata?: Record<string, any>) {
         const doc = await prisma.notebookDocument.create({
             data: {
                 notebookId,
@@ -122,7 +122,8 @@ export class DocumentService {
                 content,
                 metadata: {
                     title: title || "Raw Text Snippet",
-                    fileSize: content.length
+                    fileSize: content.length,
+                    ...customMetadata
                 }
             }
         });

@@ -99,6 +99,7 @@ export const chatApi = {
       const decoder = new TextDecoder();
       let fullText = "";
       let buffer = "";
+      const metadata: { messageId?: string; userMessageId?: string } = {};
 
       while (true) {
         const { done, value } = await reader.read();
@@ -123,6 +124,12 @@ export const chatApi = {
                 fullText += parsed.chunk;
                 if (onChunk) onChunk(parsed.chunk);
               }
+              if (parsed.messageId) {
+                metadata.messageId = parsed.messageId;
+              }
+              if (parsed.userMessageId) {
+                metadata.userMessageId = parsed.userMessageId;
+              }
             } catch {
               fullText += dataStr;
               if (onChunk) onChunk(dataStr);
@@ -132,7 +139,7 @@ export const chatApi = {
         }
       }
 
-      if (onComplete) onComplete(fullText);
+      if (onComplete) onComplete(fullText, metadata);
     } catch (err: any) {
       if (onError) onError(err);
       else console.error("SSE Chat error:", err);

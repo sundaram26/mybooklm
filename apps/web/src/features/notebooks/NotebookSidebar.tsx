@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import {
   Plus, Globe, Search, FileText, FileCode,
-  Image as ImageIcon, Link as LinkIcon, Loader2, Trash2, Folder
+  Image as ImageIcon, Link as LinkIcon, Loader2, Trash2, Folder, ChevronDown, ChevronRight
 } from "lucide-react";
 import { useWorkspaceStore } from "../../store/workspaceStore";
 import { useDocuments, useDeleteDocument } from "../../lib/hooks";
@@ -16,6 +16,7 @@ const YoutubeIcon = ({ size = 14 }: { size?: number }) => (
 
 export function NotebookSidebar() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({});
   const { selectedNotebook, setCenterPanelMode, selectedDocumentId, setSelectedDocumentId } = useWorkspaceStore();
   const notebookId = selectedNotebook?.id || "";
   const { data: documents = [], isLoading } = useDocuments(notebookId || undefined);
@@ -168,15 +169,22 @@ export function NotebookSidebar() {
                 return acc;
               }, {} as Record<string, any[]>);
 
-              return Object.entries(grouped).map(([folder, docs]) => (
+              return Object.entries(grouped).map(([folder, docs]) => {
+                const isExpanded = folder === "General" || expandedFolders[folder] !== false; // expanded by default
+                
+                return (
                 <div key={folder} style={{ marginBottom: "8px" }}>
                   {folder !== "General" && (
-                    <div style={{ display: "flex", alignItems: "center", gap: "4px", padding: "4px 8px", color: "var(--text-subtle)", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.02em" }}>
+                    <div 
+                      onClick={() => setExpandedFolders(prev => ({ ...prev, [folder]: !isExpanded }))}
+                      style={{ display: "flex", alignItems: "center", gap: "4px", padding: "4px 8px", color: "var(--text-subtle)", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.02em", cursor: "pointer", userSelect: "none" }}
+                    >
+                      {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
                       <Folder size={10} />
-                      {folder.split('/').pop()}
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{folder.split('/').pop()}</span>
                     </div>
                   )}
-                  {docs.map((doc: any) => {
+                  {isExpanded && docs.map((doc: any) => {
                     const isSelected = selectedDocumentId === doc.id;
                     const isPending = doc.status === "PENDING" || doc.status === "PROCESSING";
                     const isFailed = doc.status === "FAILED";
@@ -191,25 +199,42 @@ export function NotebookSidebar() {
                           border: `1px solid ${isSelected ? "var(--border-medium)" : "transparent"}`,
                           cursor: "pointer", transition: "all var(--transition-fast)",
                         }}
-                        onClick={() => { setSelectedDocumentId(doc.id); setCenterPanelMode("chat"); }}
+                        onClick={() => { 
+                          setSelectedDocumentId(doc.id); 
+                          if (doc.studioFeature) {
+                            setCenterPanelMode("studio");
+                          } else {
+                            setCenterPanelMode("chat");
+                          }
+                        }}
                         onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = "var(--bg-canvas)"; }}
                         onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                       >
                         <span style={{ color: isSelected ? "var(--accent-orange)" : "var(--text-subtle)", flexShrink: 0 }}>
                           {getDocIcon(doc)}
                         </span>
-                        <span style={{
-                          flex: 1, fontSize: "0.78rem", fontWeight: isSelected ? 500 : 400,
-                          color: isSelected ? "var(--text-primary)" : "var(--text-secondary)",
-                          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                        }}>
-                          {doc.title}
-                        </span>
+                        <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+                          <span style={{
+                            fontSize: "0.78rem", fontWeight: isSelected ? 500 : 400,
+                            color: isSelected ? "var(--text-primary)" : "var(--text-secondary)",
+                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                          }}>
+                            {doc.title}
+                          </span>
+                          {isPending && doc.progressMessage && (
+                            <span style={{ fontSize: "0.65rem", color: "var(--status-warning-text)", marginTop: "1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              {doc.progressMessage}
+                            </span>
+                          )}
+                        </div>
                         {/* Status dot */}
-                        <span style={{
-                          width: "5px", height: "5px", borderRadius: "50%", flexShrink: 0,
-                          background: isPending ? "#FBBF24" : isFailed ? "var(--status-error-text)" : "#34D399",
-                          animation: isPending ? "pulse 1.5s ease-in-out infinite" : "none",
+                        <span 
+                          title={isPending ? (doc.progressMessage || "Processing...") : isFailed ? "Failed" : "Ready"}
+                          style={{
+                            width: "5px", height: "5px", borderRadius: "50%", flexShrink: 0,
+                            background: isPending ? "#FBBF24" : isFailed ? "var(--status-error-text)" : "#34D399",
+                            animation: isPending ? "pulse 1.5s ease-in-out infinite" : "none",
+                            cursor: "help",
                         }} />
                         {/* Delete on hover */}
                         <button
@@ -238,7 +263,7 @@ export function NotebookSidebar() {
                     );
                   })}
                 </div>
-              ));
+              )});
             })()}
           </div>
         )}

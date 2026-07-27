@@ -6,6 +6,8 @@ import { QdrantDatabase } from "../../infrastructure/vector_db/qdrant.database";
 import cryptoModule from "crypto";
 import { Worker } from "bullmq";
 import { ingestionQueue, redisConnection } from "./queue";
+import { YoutubeParser } from "./parsers/youtube.parser";
+import { DocumentType } from "../../../generated/prisma/client";
 
 export class IngestionProcessor {
     private static qdrant = new QdrantDatabase();
@@ -57,6 +59,30 @@ export class IngestionProcessor {
                 where: { id: documentId }
             });
 
+            const reportProgress = async (progress: number, message: string) => {
+                try {
+                    const currentDoc = await prisma.notebookDocument.findUnique({
+                        where: { id: documentId },
+                        select: { metadata: true }
+                    });
+                    if (currentDoc) {
+                        const meta = (currentDoc.metadata as Record<string, any>) || {};
+                        await prisma.notebookDocument.update({
+                            where: { id: documentId },
+                            data: {
+                                metadata: {
+                                    ...meta,
+                                    progress,
+                                    progressMessage: message
+                                }
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error("[Ingestion] Failed to update progress:", e);
+                }
+            };
+
             if (!document) {
                 console.error(`[Ingestion] Document ${documentId} not found in database.`);
                 return;
@@ -68,7 +94,54 @@ export class IngestionProcessor {
                 data: { status: "PROCESSING" }
             });
 
-            // 2. Parse source
+            // 2. Intercept YouTube playlists and explode them into individual documents
+            if (document.type === "LINK" && (document.metadata as any)?.provider === "youtube-playlist") {
+                await reportProgress(10, "Fetching playlist details...");
+                
+                const ytParser = new YoutubeParser();
+                if (!document.url) throw new Error("No URL found for playlist");
+                
+                const { videoIds, title } = await ytParser.getPlaylistDetails(document.url);
+                await reportProgress(30, `Found ${videoIds.length} videos. Creating documents...`);
+                
+                for (let i = 0; i < videoIds.length; i++) {
+                    const vid = videoIds[i]!;
+                    await reportProgress(30 + Math.round((i/videoIds.length)*60), `Queueing video ${i+1}/${videoIds.length}...`);
+                    
+                    const newDoc = await prisma.notebookDocument.create({
+                        data: {
+                            notebookId: document.notebookId,
+                            type: DocumentType.LINK,
+                            url: `https://youtube.com/watch?v=${vid}`,
+                            metadata: {
+                                provider: "youtube-video",
+                                title: `YouTube Video (${vid})`, // Title will be updated by parser during ingestion
+                                relativePath: title, // Group by playlist title
+                                fileSize: 0
+                            }
+                        }
+                    });
+                    
+                    await IngestionProcessor.queueIngestion(newDoc.id);
+                }
+                
+                // Delete original playlist document container
+                await prisma.notebookDocument.delete({ where: { id: documentId } });
+                console.log(`[Ingestion] Exploded playlist ${documentId} into ${videoIds.length} documents and deleted container.`);
+                return;
+            }
+
+            // Intercept Studio documents so they don't get chunked/embedded
+            if (document.type === "TEXT" && (document.metadata as any)?.studioFeature) {
+                await prisma.notebookDocument.update({
+                    where: { id: documentId },
+                    data: { status: "COMPLETED" }
+                });
+                console.log(`[Ingestion] Studio document ${documentId} (${(document.metadata as any).studioFeature}) marked COMPLETED instantly.`);
+                return;
+            }
+
+            // 3. Parse source
             let source: string | Buffer = "";
             let parserSource = "";
             
@@ -82,6 +155,7 @@ export class IngestionProcessor {
                     const storage = FileStorageFactory.getStorage();
                     
                     console.log(`[Ingestion] Downloading source buffer from storage: ${destKey}`);
+                    await reportProgress(5, "Downloading file...");
                     const fileBuffer = await storage.downloadFile(destKey);
                     
                     source = fileBuffer;
@@ -111,7 +185,8 @@ export class IngestionProcessor {
             const parser = ParserFactory.getParser(document.type as "LINK" | "FILE" | "TEXT" | "IMAGE", parserSource, docMetadata.mimeType);
             
             console.log(`[Ingestion] Parsing content using parser: ${parser.constructor.name}`);
-            const parsed = await parser.parse(source);
+            await reportProgress(10, "Starting to parse content...");
+            const parsed = await parser.parse(source, { onProgress: reportProgress });
 
             // 4. Save rawText back to Postgres content field
             await prisma.notebookDocument.update({
@@ -125,6 +200,7 @@ export class IngestionProcessor {
 
             // 6. Generate embeddings in batch and upsert to Qdrant
             console.log(`[Ingestion] Generating batch embeddings and upserting ${parsed.chunks.length} chunks...`);
+            await reportProgress(90, "Generating embeddings...");
             const texts = parsed.chunks.map(c => c.text);
             const vectors = await EmbeddingService.getEmbeddings(texts);
             
@@ -153,11 +229,20 @@ export class IngestionProcessor {
             }
 
             // 7. Update status to COMPLETED
+            const finalDoc = await prisma.notebookDocument.findUnique({ where: { id: documentId }});
+            const finalMeta = (finalDoc?.metadata as Record<string, any>) || {};
+            delete finalMeta.progress;
+            delete finalMeta.progressMessage;
+            if (parsed.metadata?.title && finalMeta.title?.startsWith("YouTube Video (")) {
+                finalMeta.title = parsed.metadata.title;
+            }
+
             await prisma.notebookDocument.update({
                 where: { id: documentId },
                 data: {
                     status: "COMPLETED",
-                    errorMessage: null
+                    errorMessage: null,
+                    metadata: finalMeta
                 }
             });
             console.log(`[Ingestion] Successfully ingested document: ${documentId}`);
@@ -165,11 +250,33 @@ export class IngestionProcessor {
         } catch (error: any) {
             console.error(`[Ingestion] Ingestion failed for document ${documentId}:`, error);
             try {
+                const currentDoc = await prisma.notebookDocument.findUnique({
+                    where: { id: documentId },
+                    select: { metadata: true, url: true }
+                });
+                const currentMeta = (currentDoc?.metadata as Record<string, any>) || {};
+                
+                if (currentMeta.title?.startsWith("YouTube Video (") && currentDoc?.url) {
+                    try {
+                        const ytParser = new YoutubeParser();
+                        const vid = ytParser.extractVideoId(currentDoc.url);
+                        if (vid) {
+                            const realTitle = await ytParser.getVideoTitle(vid);
+                            if (realTitle && !realTitle.startsWith("YouTube Video (")) {
+                                currentMeta.title = realTitle;
+                            }
+                        }
+                    } catch (titleErr) {
+                        // ignore title fetch error
+                    }
+                }
+
                 await prisma.notebookDocument.update({
                     where: { id: documentId },
                     data: {
                         status: "FAILED",
-                        errorMessage: error.message || String(error)
+                        errorMessage: error.message || String(error),
+                        metadata: currentMeta
                     }
                 });
             } catch (dbError) {

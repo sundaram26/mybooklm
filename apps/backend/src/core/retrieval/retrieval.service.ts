@@ -143,6 +143,11 @@ JSON Response:`;
                 const scoresList = JSON.parse(cleanJson) as Array<{ index: number; score: number }>;
                 
                 // Assign scores back
+                // Set all scores to 0 first to prevent mixing 0-1 cosine similarity scores with 0-10 LLM scores
+                for (const item of finalResults) {
+                    item.score = 0;
+                }
+
                 for (const scoreObj of scoresList) {
                     if (finalResults[scoreObj.index]) {
                         finalResults[scoreObj.index]!.score = scoreObj.score;

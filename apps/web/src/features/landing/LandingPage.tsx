@@ -241,114 +241,17 @@ export function LandingPage() {
             <div className="w-[50px]" />
           </div>
 
-          {/* Mock Web Interface */}
-          <div className="absolute inset-x-0 bottom-0 top-[49px] bg-[var(--bg-card)] flex select-none">
-
-            {/* Left sidebar mockup */}
-            <div className="w-[220px] hidden md:flex flex-col gap-4 border-r border-[var(--border-subtle)] p-4 bg-[#FCFBF9] dark:bg-[var(--bg-canvas-subtle)]">
-              <div className="text-[0.78rem] font-bold text-[var(--text-muted)] uppercase tracking-wider">Sources (3)</div>
-
-              <div className="bg-[#FFF0ED] dark:bg-accent-orange/15 border border-accent-orange/20 rounded-xl p-3 flex items-center gap-2.5">
-                <FileText size={16} className="text-accent-orange" />
-                <div className="flex-1 min-w-0">
-                  <div className="text-[0.8rem] font-bold text-[var(--text-primary)] truncate">cell_pathway.pdf</div>
-                  <div className="text-[0.7rem] text-[var(--text-muted)] font-medium">Pages: 14 • 2.4 MB</div>
-                </div>
-              </div>
-
-              <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl p-3 flex items-center gap-2.5 hover:border-accent-orange/30 cursor-pointer">
-                <FileText size={16} className="text-[#94A3B8]" />
-                <div className="flex-1 min-w-0">
-                  <div className="text-[0.8rem] font-bold text-[var(--text-primary)] truncate">transcripts.srt</div>
-                  <div className="text-[0.7rem] text-[var(--text-muted)] font-medium">Timeline: 42m</div>
-                </div>
-              </div>
-
-              <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl p-3 flex items-center gap-2.5 hover:border-accent-orange/30 cursor-pointer">
-                <FileText size={16} className="text-[#94A3B8]" />
-                <div className="flex-1 min-w-0">
-                  <div className="text-[0.8rem] font-bold text-[var(--text-primary)] truncate">diagram.png</div>
-                  <div className="text-[0.7rem] text-[var(--text-muted)] font-medium">Image OCR</div>
-                </div>
-              </div>
-
-              <div className="h-[2px] bg-[#E2DCD5] my-2" />
-
-              <div className="text-[0.78rem] font-bold text-[var(--text-muted)] uppercase tracking-wider">Quick Studio</div>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="bg-[#FFF0ED] dark:bg-accent-orange/15 hover:bg-[#FFE1DB] dark:hover:bg-accent-orange/25 rounded-lg p-2 text-center text-[0.72rem] font-bold text-accent-orange border border-accent-orange/10 cursor-pointer transition-colors">
-                  Quiz
-                </div>
-                <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-lg p-2 text-center text-[0.72rem] font-bold text-[var(--text-secondary)] cursor-pointer hover:border-accent-orange/30 transition-colors">
-                  Flashcard
-                </div>
-              </div>
-            </div>
-
-            {/* Center Chat feed mockup */}
-            <div className="flex-1 flex flex-col justify-between p-6 bg-[var(--bg-card)] border-r border-[var(--border-subtle)]">
-              <div className="space-y-4 overflow-y-auto max-h-[80%]">
-
-                {/* User message */}
-                <div className="flex items-start justify-end gap-2.5">
-                  <div className="bg-[#F1F5F9] dark:bg-[#334155] rounded-2xl rounded-tr-none px-4 py-3 max-w-[80%]">
-                    <p className="text-[0.85rem] text-[var(--text-primary)] font-medium">
-                      What are the main stages of Glycolysis and how do they connect to the diagram?
-                    </p>
-                  </div>
-                </div>
-
-                {/* Assistant message */}
-                <div className="flex items-start gap-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-accent-orange text-white flex items-center justify-center text-[0.75rem] font-bold shrink-0">
-                    AI
-                  </div>
-                  <div className="bg-[#FFF0ED]/40 border border-accent-orange/10 rounded-2xl rounded-tl-none px-4 py-3 max-w-[85%]">
-                    <p className="text-[0.85rem] text-[var(--text-primary)] leading-relaxed font-medium">
-                      Based on <strong className="text-accent-orange">cell_pathway.pdf [Page 4]</strong>, Glycolysis consists of two main stages: the energy investment phase and the energy payoff phase <span className="bg-accent-orange/10 text-accent-orange px-1 rounded font-extrabold text-[0.72rem] cursor-pointer">[1]</span>.
-                    </p>
-                    <p className="text-[0.85rem] text-[var(--text-primary)] leading-relaxed font-medium mt-2">
-                      The image <strong className="text-accent-orange">diagram.png</strong> maps this visually, showing the conversion of Glucose to Pyruvate <span className="bg-accent-orange/10 text-accent-orange px-1 rounded font-extrabold text-[0.72rem] cursor-pointer">[2]</span>.
-                    </p>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Chat Input */}
-              <div className="h-12 bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl flex items-center px-4 justify-between shadow-sm">
-                <span className="text-[0.82rem] text-[#94A3B8] font-medium">Ask questions about cell_pathway.pdf or transcripts.srt...</span>
-                <div className="w-8 h-8 rounded-lg bg-accent-orange text-white flex items-center justify-center cursor-pointer shadow-md shadow-accent-orange/10 hover:bg-accent-orange-hover">
-                  <ArrowRight size={16} />
-                </div>
-              </div>
-            </div>
-
-            {/* Right citation info mockup */}
-            <div className="w-[200px] hidden lg:flex flex-col gap-4 p-4 bg-[#FCFBF9] dark:bg-[var(--bg-canvas-subtle)]">
-              <div className="text-[0.78rem] font-bold text-[var(--text-muted)] uppercase tracking-wider">Citations Used</div>
-
-              <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl p-3 space-y-1.5 shadow-sm">
-                <div className="flex justify-between items-center text-[0.75rem] font-bold text-[var(--text-primary)]">
-                  <span>[1] Pathway Detail</span>
-                  <span className="text-accent-orange bg-[#FFF0ED] dark:bg-accent-orange/15 px-1.5 py-0.5 rounded text-[0.68rem]">Page 4</span>
-                </div>
-                <p className="text-[0.7rem] text-[var(--text-muted)] leading-[1.4] line-clamp-3 font-medium">
-                  "...The first phase requires 2 ATP molecules to phosphorylate Glucose..."
-                </p>
-              </div>
-
-              <div className="bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-xl p-3 space-y-1.5 shadow-sm">
-                <div className="flex justify-between items-center text-[0.75rem] font-bold text-[var(--text-primary)]">
-                  <span>[2] Visual OCR</span>
-                  <span className="text-accent-orange bg-[#FFF0ED] dark:bg-accent-orange/15 px-1.5 py-0.5 rounded text-[0.68rem]">Diagram</span>
-                </div>
-                <p className="text-[0.7rem] text-[var(--text-muted)] leading-[1.4] line-clamp-3 font-medium">
-                  {"Table elements parsed: Glucose \u2192 G6P \u2192 F6P \u2192 F1,6BP \u2192 Pyruvate."}
-                </p>
-              </div>
-            </div>
-
+          {/* Showcase Video */}
+          <div className="absolute inset-x-0 bottom-0 top-[49px] bg-zinc-950 flex items-center justify-center">
+            <video 
+              src="/noetalm.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              controls
+              className="w-full h-full object-cover"
+            />
           </div>
 
         </div>

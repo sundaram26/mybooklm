@@ -30,10 +30,16 @@ export class QdrantDatabase implements IVectorDatabase {
 
     async createCollection(collectionName: string, vectorSize: number): Promise<void> {
         try {
-            // Check if collection exists
-            await this.request(`/collections/${collectionName}`);
+            // Check if collection exists and verify vector size
+            const info = await this.request(`/collections/${collectionName}`);
+            const currentSize = info.result?.config?.params?.vectors?.size;
+            if (currentSize && currentSize !== vectorSize) {
+                console.log(`Qdrant collection ${collectionName} has size ${currentSize} but expected ${vectorSize}. Recreating...`);
+                await this.request(`/collections/${collectionName}`, { method: "DELETE" }).catch(e => {});
+                throw new Error("Recreate collection");
+            }
         } catch {
-            // Assume collection does not exist, create it
+            // Assume collection does not exist (or size mismatch occurred), create it
             console.log(`Creating Qdrant collection: ${collectionName} (vector size: ${vectorSize})`);
             await this.request(`/collections/${collectionName}`, {
                 method: "PUT",

@@ -11,16 +11,25 @@ export class EmbeddingService {
         const openaiKey = env.OPENAI_API_KEY;
         const geminiKey = env.GEMINI_API_KEY;
 
-        // Ensure we aren't using dummy/sample keys
-        const isOpenAIConfigured = openaiKey && !openaiKey.includes("sample-openai");
-        const isGeminiConfigured = geminiKey && !geminiKey.includes("sample-gemini");
+        const provider = env.EMBEDDING_PROVIDER || "default";
+        const modelId = env.EMBEDDING_MODEL || "";
 
-        if (isOpenAIConfigured) {
+        // Resolve active provider
+        let activeProvider = provider;
+        if (activeProvider === "default") {
+            const isOpenAIConfigured = openaiKey && !openaiKey.includes("sample-openai");
+            const isGeminiConfigured = geminiKey && !geminiKey.includes("sample-gemini");
+            if (isOpenAIConfigured) activeProvider = "openai";
+            else if (isGeminiConfigured) activeProvider = "google";
+        }
+
+        if (activeProvider === "openai" && openaiKey && !openaiKey.includes("sample-openai")) {
             try {
                 const openai = new OpenAI({ apiKey: openaiKey });
                 const response = await openai.embeddings.create({
-                    model: "text-embedding-3-small",
+                    model: modelId || "text-embedding-3-small",
                     input: text,
+                    dimensions: 768, // Align with Gemini's 768 dimensions
                 });
                 const vector = response.data[0]?.embedding;
                 if (vector) return vector;
@@ -29,10 +38,10 @@ export class EmbeddingService {
             }
         }
 
-        if (isGeminiConfigured) {
+        if ((activeProvider === "google" || activeProvider === "gemini") && geminiKey && !geminiKey.includes("sample-gemini")) {
             try {
                 const genAI = new GoogleGenerativeAI(geminiKey!);
-                const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+                const model = genAI.getGenerativeModel({ model: modelId || "text-embedding-004" });
                 const result = await model.embedContent(text);
                 const vector = result.embedding.values;
                 if (vector) return vector;
@@ -41,8 +50,8 @@ export class EmbeddingService {
             }
         }
 
-        // Mock embedding for local offline testing (OpenAI size = 1536 dimensions)
-        console.warn("⚠️ API keys not configured. Falling back to mock embeddings (1536 dimensions) for local testing.");
+        // Mock embedding for local offline testing (Gemini size = 768 dimensions)
+        console.warn("⚠️ API keys not configured. Falling back to mock embeddings (768 dimensions) for local testing.");
         const seedRandom = (str: string) => {
             let hash = 0;
             for (let i = 0; i < str.length; i++) {
@@ -54,7 +63,7 @@ export class EmbeddingService {
             };
         };
         const rand = seedRandom(text);
-        return Array.from({ length: 1536 }, () => rand() * 2 - 1);
+        return Array.from({ length: 768 }, () => rand() * 2 - 1);
     }
 
     /**
@@ -67,8 +76,17 @@ export class EmbeddingService {
         const openaiKey = env.OPENAI_API_KEY;
         const geminiKey = env.GEMINI_API_KEY;
 
-        const isOpenAIConfigured = openaiKey && !openaiKey.includes("sample-openai");
-        const isGeminiConfigured = geminiKey && !geminiKey.includes("sample-gemini");
+        const provider = env.EMBEDDING_PROVIDER || "default";
+        const modelId = env.EMBEDDING_MODEL || "";
+
+        // Resolve active provider
+        let activeProvider = provider;
+        if (activeProvider === "default") {
+            const isOpenAIConfigured = openaiKey && !openaiKey.includes("sample-openai");
+            const isGeminiConfigured = geminiKey && !geminiKey.includes("sample-gemini");
+            if (isOpenAIConfigured) activeProvider = "openai";
+            else if (isGeminiConfigured) activeProvider = "google";
+        }
 
         const batchSize = 100;
         const batches: string[][] = [];
@@ -81,12 +99,13 @@ export class EmbeddingService {
         for (const batch of batches) {
             let batchVectors: number[][] | null = null;
 
-            if (isOpenAIConfigured) {
+            if (activeProvider === "openai" && openaiKey && !openaiKey.includes("sample-openai")) {
                 try {
                     const openai = new OpenAI({ apiKey: openaiKey });
                     const response = await openai.embeddings.create({
-                        model: "text-embedding-3-small",
+                        model: modelId || "text-embedding-3-small",
                         input: batch,
+                        dimensions: 768, // Align with Gemini's 768 dimensions
                     });
                     batchVectors = response.data.map(item => item.embedding);
                 } catch (error) {
@@ -94,10 +113,10 @@ export class EmbeddingService {
                 }
             }
 
-            if (!batchVectors && isGeminiConfigured) {
+            if (!batchVectors && (activeProvider === "google" || activeProvider === "gemini") && geminiKey && !geminiKey.includes("sample-gemini")) {
                 try {
                     const genAI = new GoogleGenerativeAI(geminiKey!);
-                    const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+                    const model = genAI.getGenerativeModel({ model: modelId || "text-embedding-004" });
                     
                     const requests = batch.map(text => ({
                         content: { role: "user", parts: [{ text }] }
@@ -111,7 +130,7 @@ export class EmbeddingService {
             }
 
             if (!batchVectors) {
-                console.warn("⚠️ API keys not configured or failed. Falling back to mock batch embeddings (1536 dimensions) for local testing.");
+                console.warn("⚠️ API keys not configured or failed. Falling back to mock batch embeddings (768 dimensions) for local testing.");
                 batchVectors = [];
                 for (const text of batch) {
                     batchVectors.push(await this.getEmbedding(text));
@@ -128,12 +147,6 @@ export class EmbeddingService {
      * Returns the default vector dimension size based on configured providers.
      */
     static getDimensionSize(): number {
-        const openaiKey = env.OPENAI_API_KEY;
-        const isOpenAIConfigured = openaiKey && !openaiKey.includes("sample-openai");
-        
-        // OpenAI text-embedding-3-small yields 1536. Gemini text-embedding-004 yields 768.
-        if (isOpenAIConfigured) return 1536;
-        if (env.GEMINI_API_KEY && !env.GEMINI_API_KEY.includes("sample-gemini")) return 768;
-        return 1536; // Default mock dimension size
+        return 768; // Enforced 768 across all providers
     }
 }

@@ -25,7 +25,9 @@ export function StudioPanel() {
   const { 
     selectedNotebook, 
     llmSettings, 
-    setSelectedDocumentId 
+    setSelectedDocumentId,
+    setCenterPanelMode,
+    setCustomizingStudioFeature
   } = useWorkspaceStore();
 
   const notebookId = selectedNotebook?.id || "";
@@ -46,6 +48,9 @@ export function StudioPanel() {
       });
       // Automatically view the newly generated script / document!
       setSelectedDocumentId(doc.id);
+      if (doc.studioFeature) {
+        setCenterPanelMode("studio");
+      }
     } catch (err: any) {
       setErrorMsg(err.message || "Failed to generate studio output.");
     } finally {
@@ -118,7 +123,7 @@ export function StudioPanel() {
               <button
                 key={label}
                 disabled={isAnyGenerating || !notebookId}
-                onClick={() => handleGenerate(slug)}
+                onClick={() => setCustomizingStudioFeature(slug)}
                 style={{
                   display: "flex", flexDirection: "column",
                   alignItems: "center", justifyContent: "center",

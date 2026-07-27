@@ -107,9 +107,9 @@ export function useDocument(documentId?: string | null) {
 
 export function useGenerateStudio(notebookId: string) {
   const queryClient = useQueryClient();
-  return useMutation<DocumentItem, Error, { feature: string; llmSettings?: LLMConfig }>({
-    mutationFn: ({ feature, llmSettings }) =>
-      api.generateStudioOutput(notebookId, feature, { llmSettings }),
+  return useMutation<DocumentItem, Error, { feature: string; llmSettings?: LLMConfig; customParams?: Record<string, any> }>({
+    mutationFn: ({ feature, llmSettings, customParams }) =>
+      api.generateStudioOutput(notebookId, feature, { llmSettings, customParams }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["documents", notebookId] });
     },

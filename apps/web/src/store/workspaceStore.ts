@@ -43,7 +43,8 @@ interface WorkspaceState {
   llmSettings: LLMConfig;
   guestTurnCount: number;
   selectedDocumentId: string | null;
-  centerPanelMode: "chat" | "add-source";
+  centerPanelMode: "chat" | "add-source" | "studio";
+  customizingStudioFeature: string | null;
   
   // Modals
   isCreateModalOpen: boolean;
@@ -60,7 +61,8 @@ interface WorkspaceState {
   setLLMSettings: (settings: LLMConfig) => void;
   incrementGuestTurn: () => void;
   setSelectedDocumentId: (id: string | null) => void;
-  setCenterPanelMode: (mode: "chat" | "add-source") => void;
+  setCenterPanelMode: (mode: "chat" | "add-source" | "studio") => void;
+  setCustomizingStudioFeature: (feature: string | null) => void;
   
   setCreateModalOpen: (open: boolean) => void;
   setAddSourceOpen: (open: boolean) => void;
@@ -86,6 +88,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set) => ({
   guestTurnCount: 0,
   selectedDocumentId: null,
   centerPanelMode: "chat",
+  customizingStudioFeature: null,
   
   isCreateModalOpen: false,
   isAddSourceOpen: false,
@@ -126,6 +129,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set) => ({
   incrementGuestTurn: () => set((state) => ({ guestTurnCount: state.guestTurnCount + 1 })),
   setSelectedDocumentId: (selectedDocumentId) => set({ selectedDocumentId }),
   setCenterPanelMode: (centerPanelMode) => set({ centerPanelMode }),
+  setCustomizingStudioFeature: (customizingStudioFeature) => set({ customizingStudioFeature }),
 
   setCreateModalOpen: (isCreateModalOpen) => set({ isCreateModalOpen }),
   setAddSourceOpen: (isAddSourceOpen) => set({ isAddSourceOpen }),
