@@ -9,7 +9,6 @@ import { useNotebooks } from "../../lib/hooks";
 const TABS = [
   { key: "dashboard", icon: Home,     label: "Overview"    },
   { key: "sources",   icon: FileText,  label: "Sources"     },
-  { key: "settings",  icon: Settings,  label: "Settings"    },
 ] as const;
 
 export function AppBottomBar() {

@@ -105,9 +105,6 @@ export class ChatController {
             stream = false,
             useHyde = false,
             parentId,       // Optional: ID of message to branch from
-            apiKey,         // Optional: User's own LLM API key
-            modelId,        // Optional: Model to use with apiKey (e.g. "gpt-4o", "gemini-2.0-flash")
-            llmSettings,    // Optional: Full custom LLM configuration settings
         } = req.body;
 
         if (!query) {
@@ -168,20 +165,8 @@ export class ChatController {
             }
         });
 
-        // Merge legacy values (apiKey, modelId) with llmSettings if needed
-        let resolvedSettings = llmSettings;
-        if (!resolvedSettings && (apiKey || modelId)) {
-            resolvedSettings = {
-                geminiApiKey: apiKey,
-                geminiModelId: modelId,
-                activeProvider: "google"
-            };
-        }
-
-        // Build synthesisOptions
         const synthesisOptions: import("../../core/synthesis/synthesis.service").SynthesisOptions = {
-            useHyde: useHyde as boolean,
-            llmSettings: resolvedSettings
+            useHyde: useHyde as boolean
         };
 
         if (stream) {

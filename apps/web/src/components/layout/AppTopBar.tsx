@@ -15,7 +15,7 @@ export function AppTopBar({ searchQuery, onSearchChange }: AppTopBarProps) {
   const { theme, setTheme } = useTheme();
   const { data: session } = useSession();
   const user = session?.user;
-  const { setKeySettingsOpen, setAuthModalOpen, setViewMode } = useWorkspaceStore();
+  const { setAuthModalOpen, setViewMode } = useWorkspaceStore();
 
   const THEMES = [
     { v: "light",  Icon: Sun     },
@@ -112,15 +112,6 @@ export function AppTopBar({ searchQuery, onSearchChange }: AppTopBarProps) {
           ))}
         </div>
 
-        {/* LLM Keys */}
-        <button
-          onClick={() => setKeySettingsOpen(true)}
-          className="btn btn-secondary"
-          style={{ padding: "4px 10px", fontSize: "0.75rem", gap: "5px" }}
-        >
-          <Key size={12} />
-          LLM Keys
-        </button>
 
 
         {/* Divider */}

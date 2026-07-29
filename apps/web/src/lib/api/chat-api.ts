@@ -1,5 +1,5 @@
 import { axiosClient, API_BASE } from "./axios-client";
-import type { LLMConfig } from "../../store/workspaceStore";
+
 
 export interface ChatMessage {
   id: string;
@@ -67,7 +67,6 @@ export const chatApi = {
     query: string,
     options?: {
       parentId?: string;
-      llmSettings?: LLMConfig;
     },
     onChunk?: (text: string) => void,
     onComplete?: (fullText: string, metadata?: any) => void,
@@ -84,7 +83,6 @@ export const chatApi = {
           query,
           stream: true,
           parentId: options?.parentId,
-          llmSettings: options?.llmSettings,
         }),
       });
 

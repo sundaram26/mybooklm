@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, Notebook, DocumentItem } from "./api";
 import { useSession } from "./auth-client";
-import type { LLMConfig } from "../store/workspaceStore";
+
 
 // --- Queries ---
 
@@ -107,9 +107,9 @@ export function useDocument(documentId?: string | null) {
 
 export function useGenerateStudio(notebookId: string) {
   const queryClient = useQueryClient();
-  return useMutation<DocumentItem, Error, { feature: string; llmSettings?: LLMConfig; customParams?: Record<string, any> }>({
-    mutationFn: ({ feature, llmSettings, customParams }) =>
-      api.generateStudioOutput(notebookId, feature, { llmSettings, customParams }),
+  return useMutation<DocumentItem, Error, { feature: string; customParams?: Record<string, any> }>({
+    mutationFn: ({ feature, customParams }) =>
+      api.generateStudioOutput(notebookId, feature, { customParams }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["documents", notebookId] });
     },

@@ -24,7 +24,7 @@ const STUDIO_ITEMS = [
 export function StudioPanel() {
   const { 
     selectedNotebook, 
-    llmSettings, 
+
     setSelectedDocumentId,
     setCenterPanelMode,
     setCustomizingStudioFeature
@@ -44,7 +44,6 @@ export function StudioPanel() {
     try {
       const doc = await generateStudioMutation.mutateAsync({
         feature: slug,
-        llmSettings
       });
       // Automatically view the newly generated script / document!
       setSelectedDocumentId(doc.id);

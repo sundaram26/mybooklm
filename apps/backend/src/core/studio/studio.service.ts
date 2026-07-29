@@ -6,11 +6,9 @@ import { ProviderFactory } from "../../infrastructure/llm/providers/provider.fac
 import { SUPPORTED_MODELS } from "../../config/models";
 import { env } from "../../config/env.config";
 import { LLMManager } from "../../infrastructure/llm/llm-manager";
-import type { LLMConfig } from "../../infrastructure/llm/llm-manager";
 import { RetrievalService } from "../retrieval/retrieval.service";
 
 export interface StudioOptions {
-    llmSettings?: LLMConfig | undefined;
     customParams?: Record<string, any> | undefined;
 }
 
@@ -28,8 +26,8 @@ const FEATURE_TITLES: Record<string, string> = {
 
 export class StudioService {
     
-    private static getLLM(settings?: LLMConfig) {
-        return LLMManager.getLLM(settings, "high");
+    private static getLLM() {
+        return LLMManager.getLLM("high");
     }
 
     static async generateStudioOutput(
@@ -60,7 +58,7 @@ export class StudioService {
         const queryTopic = customParams.topic || customParams.focus || title;
 
         console.log(`[Studio] Retrieving top chunks for feature: ${title} using search query: ${queryTopic}`);
-        const chunks = await RetrievalService.retrieve(notebookId, queryTopic, { limit: 20, useHyde: true, llmSettings: options.llmSettings });
+        const chunks = await RetrievalService.retrieve(notebookId, queryTopic, { limit: 20, useHyde: true });
         
         let context = "";
         if (chunks.length > 0) {
@@ -170,7 +168,7 @@ export class StudioService {
         };
 
         // 4. Instantiate LLM provider
-        const llm = this.getLLM(options.llmSettings);
+        const llm = this.getLLM();
         
         // Build Customization instructions
         let customInstruction = "";

@@ -13,7 +13,6 @@ import { NotebookHeader } from "../features/notebooks/NotebookHeader";
 import { NotebookSidebar } from "../features/notebooks/NotebookSidebar";
 import { StudioPanel } from "../features/notebooks/StudioPanel";
 import { AuthModal } from "../features/auth/AuthModal";
-import { KeySettingsModal } from "../features/settings/KeySettingsModal";
 import { StudioContentViewer } from "../features/notebooks/StudioContentViewer";
 import { CustomizeStudioModal } from "../features/notebooks/CustomizeStudioModal";
 import { useSession } from "../lib/auth-client";
@@ -28,9 +27,9 @@ export default function Home() {
 
   const {
     viewMode, currentView, selectedNotebook, activeTab,
-    isCreateModalOpen, isAddSourceOpen, isAuthModalOpen, isKeySettingsOpen,
+    isCreateModalOpen, isAddSourceOpen, isAuthModalOpen,
     setViewMode, setCurrentView, setSelectedNotebook, setActiveTab,
-    setCreateModalOpen, setAddSourceOpen, setAuthModalOpen, setKeySettingsOpen,
+    setCreateModalOpen, setAddSourceOpen, setAuthModalOpen,
     selectedDocumentId, centerPanelMode, setCenterPanelMode,
     customizingStudioFeature, setCustomizingStudioFeature,
   } = useWorkspaceStore();
@@ -134,7 +133,6 @@ export default function Home() {
           </div>
         </div>
 
-        <KeySettingsModal isOpen={isKeySettingsOpen} onClose={() => setKeySettingsOpen(false)} />
         <AuthModal isOpen={isAuthModalOpen} onClose={() => setAuthModalOpen(false)} onSuccess={() => setViewMode("app")} />
         <CustomizeStudioModal
           isOpen={customizingStudioFeature !== null}
@@ -174,19 +172,6 @@ export default function Home() {
           </div>
         )}
 
-        {currentView === "settings" && (
-          <div style={{ padding: "24px 32px", maxWidth: "960px", margin: "0 auto" }}>
-            <h2 style={{ fontSize: "0.9375rem", fontWeight: "600", color: "var(--text-primary)", marginBottom: "4px" }}>
-              Model Settings
-            </h2>
-            <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "16px" }}>
-              Configure your Gemini, OpenAI, or Anthropic API key to route prompts directly.
-            </p>
-            <button onClick={() => setKeySettingsOpen(true)} className="btn btn-primary">
-              Configure Keys
-            </button>
-          </div>
-        )}
       </main>
 
       {/* Bottom tab bar */}
@@ -196,7 +181,6 @@ export default function Home() {
       <CreateNotebookModal isOpen={isCreateModalOpen} onClose={() => setCreateModalOpen(false)} />
       <AddSourceModal isOpen={isAddSourceOpen} onClose={() => setAddSourceOpen(false)} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setAuthModalOpen(false)} onSuccess={() => setViewMode("app")} />
-      <KeySettingsModal isOpen={isKeySettingsOpen} onClose={() => setKeySettingsOpen(false)} />
       <CustomizeStudioModal
         isOpen={customizingStudioFeature !== null}
         feature={customizingStudioFeature}

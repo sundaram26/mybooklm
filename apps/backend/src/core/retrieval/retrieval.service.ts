@@ -3,12 +3,11 @@ import { EmbeddingService } from "../embedding/embedding.service";
 import { ProviderFactory } from "../../infrastructure/llm/providers/provider.factory";
 import { env } from "../../config/env.config";
 import { LLMManager } from "../../infrastructure/llm/llm-manager";
-import type { LLMConfig } from "../../infrastructure/llm/llm-manager";
+
 
 export interface RetrievalOptions {
     useHyde?: boolean | undefined;
     limit?: number | undefined;
-    llmSettings?: LLMConfig | undefined;
 }
 
 export interface RetrievalResult {
@@ -21,8 +20,8 @@ export class RetrievalService {
     private static qdrant = new QdrantDatabase();
     private static COLLECTION_NAME = "notebook_chunks";
 
-    private static getLLM(settings?: LLMConfig) {
-        return LLMManager.getLLM(settings, "mini");
+    private static getLLM() {
+        return LLMManager.getLLM("mini");
     }
 
     /**
@@ -38,7 +37,7 @@ export class RetrievalService {
         const limit = options.limit ?? 5;
         
         let targetSearchText = query;
-        const llm = this.getLLM(options.llmSettings);
+        const llm = this.getLLM();
 
         if (llm) {
             try {

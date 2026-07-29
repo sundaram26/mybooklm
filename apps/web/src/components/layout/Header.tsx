@@ -12,7 +12,7 @@ interface HeaderProps {
 export function Header({ searchQuery, onSearchChange }: HeaderProps) {
   const {
     selectedNotebook, setSelectedNotebook, setCurrentView,
-    setCreateModalOpen, setKeySettingsOpen, setCenterPanelMode, setSelectedDocumentId,
+    setCreateModalOpen, setCenterPanelMode, setSelectedDocumentId,
   } = useWorkspaceStore();
 
   return (
@@ -79,15 +79,6 @@ export function Header({ searchQuery, onSearchChange }: HeaderProps) {
           />
         </div>
 
-        {/* LLM Keys */}
-        <button
-          onClick={() => setKeySettingsOpen(true)}
-          className="btn btn-secondary"
-          style={{ padding: "5px 10px", fontSize: "0.76rem", gap: "5px" }}
-        >
-          <Key size={12} />
-          <span>LLM Keys</span>
-        </button>
 
         {/* Primary action */}
         {selectedNotebook ? (

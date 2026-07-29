@@ -5,24 +5,14 @@ import { asyncHandler } from "../../utils/asyncHandler";
 export class StudioController {
     static generate = asyncHandler(async (req: Request, res: Response) => {
         const notebookId = req.params.notebookId as string;
-        const { feature, apiKey, modelId, llmSettings, customParams } = req.body;
+        const { feature, customParams } = req.body;
 
         if (!feature) {
             res.status(400).json({ success: false, message: "Studio feature parameter is required." });
             return;
         }
 
-        let resolvedSettings = llmSettings;
-        if (!resolvedSettings && (apiKey || modelId)) {
-            resolvedSettings = {
-                geminiApiKey: apiKey,
-                geminiModelId: modelId,
-                activeProvider: "google"
-            };
-        }
-
         const studioOptions = {
-            llmSettings: resolvedSettings,
             customParams
         };
 

@@ -21,7 +21,6 @@ const YoutubeIcon = ({ size = 14 }: { size?: number }) => (
 const NAV_ITEMS = [
   { key: "dashboard", icon: Home,     label: "Overview"    },
   { key: "sources",   icon: FileText,  label: "All Sources" },
-  { key: "settings",  icon: Settings,  label: "Settings"    },
 ] as const;
 
 const THEME_OPTIONS = [

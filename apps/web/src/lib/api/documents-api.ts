@@ -1,5 +1,5 @@
 import { axiosClient, API_BASE } from "./axios-client";
-import type { LLMConfig } from "../../store/workspaceStore";
+
 
 export interface DocumentItem {
   id: string;
@@ -96,12 +96,11 @@ export const documentsApi = {
   async generateStudioOutput(
     notebookId: string,
     feature: string,
-    options?: { llmSettings?: LLMConfig; customParams?: Record<string, any> }
+    options?: { customParams?: Record<string, any> }
   ): Promise<DocumentItem> {
     try {
       const response = await axiosClient.post(`/notebooks/${notebookId}/studio`, {
         feature,
-        llmSettings: options?.llmSettings,
         customParams: options?.customParams,
       });
       return response.data?.data;

@@ -4,7 +4,7 @@ import type { ChatMessage, ChatRole } from "../../infrastructure/llm/interfaces/
 import { env } from "../../config/env.config";
 import { SUPPORTED_MODELS } from "../../config/models";
 import { LLMManager } from "../../infrastructure/llm/llm-manager";
-import type { LLMConfig } from "../../infrastructure/llm/llm-manager";
+
 
 export interface SynthesisResponse {
     text: string;
@@ -14,13 +14,12 @@ export interface SynthesisResponse {
 export interface SynthesisOptions {
     useHyde?: boolean;
     limit?: number;
-    llmSettings?: LLMConfig | undefined;
 }
 
 export class SynthesisService {
 
-    private static getLLM(settings?: LLMConfig) {
-        return LLMManager.getLLM(settings, "medium");
+    private static getLLM() {
+        return LLMManager.getLLM("medium");
     }
 
     /**
@@ -79,8 +78,7 @@ ${formattedSources}
         console.log(`[Synthesis] Retrieving sources for RAG chat session in notebook: ${notebookId}`);
         const sources = await RetrievalService.retrieve(notebookId, query, {
             useHyde: options.useHyde,
-            limit,
-            llmSettings: options.llmSettings
+            limit
         });
 
         if (sources.length === 0) {
@@ -94,7 +92,7 @@ ${formattedSources}
         const messages = this.prepareMessages(query, history, sources);
 
         // 3. Call LLM
-        const llm = this.getLLM(options.llmSettings);
+        const llm = this.getLLM();
         console.log(`[Synthesis] Generating grounded answer using LLM: ${llm.modelId}`);
         const responseText = await llm.provider.generateText(llm.modelId, messages);
 
@@ -117,8 +115,7 @@ ${formattedSources}
         console.log(`[Synthesis] Retrieving sources for streaming RAG in notebook: ${notebookId}`);
         const sources = await RetrievalService.retrieve(notebookId, query, {
             useHyde: options.useHyde,
-            limit,
-            llmSettings: options.llmSettings
+            limit
         });
 
         if (sources.length === 0) {
@@ -136,7 +133,7 @@ ${formattedSources}
         const messages = this.prepareMessages(query, history, sources);
 
         // 3. Stream from LLM
-        const llm = this.getLLM(options.llmSettings);
+        const llm = this.getLLM();
         console.log(`[Synthesis] Streaming grounded answer from LLM: ${llm.modelId}`);
         const textStream = llm.provider.streamText(llm.modelId, messages);
 

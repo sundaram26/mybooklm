@@ -1,63 +1,9 @@
 import { ProviderFactory } from "./providers/provider.factory";
 import { env } from "../../config/env.config";
 
-export interface TierConfig {
-    provider: "google" | "openai" | "anthropic" | "other" | "default";
-    apiKey?: string;
-    modelId?: string;
-    baseUrl?: string;
-}
-
-export interface LLMConfig {
-    mini?: TierConfig;
-    medium?: TierConfig;
-    high?: TierConfig;
-}
-
 export class LLMManager {
-    /**
-     * Resolves the configured LLM provider and model based on custom user settings or server defaults
-     * for a given task tier.
-     * 
-     * @param settings User's tier-based custom configurations
-     * @param tier The task tier: "mini" (small tasks), "medium" (grounded chat), or "high" (studio generation)
-     */
-    static getLLM(settings?: LLMConfig, tier: "mini" | "medium" | "high" = "medium") {
-        const tierConfig = settings?.[tier];
-        const provider = tierConfig?.provider || "default";
+    static getLLM(tier: "mini" | "medium" | "high" = "medium") {
 
-        // 1. Resolve custom user configuration if set for this tier
-        if (provider === "google") {
-            const modelId = tierConfig?.modelId || "gemini-2.0-flash";
-            return {
-                provider: ProviderFactory.getProvider(modelId, tierConfig?.apiKey, "google"),
-                modelId
-            };
-        }
-
-        if (provider === "openai") {
-            const modelId = tierConfig?.modelId || "gpt-4o-mini";
-            return {
-                provider: ProviderFactory.getProvider(modelId, tierConfig?.apiKey, "openai"),
-                modelId
-            };
-        }
-
-        if (provider === "anthropic") {
-            const modelId = tierConfig?.modelId || "claude-3-5-haiku-20241022";
-            return {
-                provider: ProviderFactory.getProvider(modelId, tierConfig?.apiKey, "anthropic"),
-                modelId
-            };
-        }
-
-        if (provider === "other") {
-            const modelId = tierConfig?.modelId || "meta-llama/llama-3-8b-instruct";
-            return {
-                provider: ProviderFactory.getProvider(modelId, tierConfig?.apiKey, "other", tierConfig?.baseUrl),
-                modelId
-            };
-        }
 
         // 2. Fallback to server-side tier-specific defaults
         let defaultProvider = "default";
