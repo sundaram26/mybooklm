@@ -67,6 +67,7 @@ export const chatApi = {
     query: string,
     options?: {
       parentId?: string;
+      selectedModelId?: string | null;
     },
     onChunk?: (text: string) => void,
     onComplete?: (fullText: string, metadata?: any) => void,
@@ -83,6 +84,7 @@ export const chatApi = {
           query,
           stream: true,
           parentId: options?.parentId,
+          selectedModelId: options?.selectedModelId,
         }),
       });
 

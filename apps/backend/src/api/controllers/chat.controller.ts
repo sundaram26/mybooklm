@@ -105,6 +105,7 @@ export class ChatController {
             stream = false,
             useHyde = false,
             parentId,       // Optional: ID of message to branch from
+            selectedModelId,
         } = req.body;
 
         if (!query) {
@@ -168,6 +169,9 @@ export class ChatController {
         const synthesisOptions: import("../../core/synthesis/synthesis.service").SynthesisOptions = {
             useHyde: useHyde as boolean
         };
+        if (selectedModelId) {
+            synthesisOptions.selectedModelId = selectedModelId as string;
+        }
 
         if (stream) {
             // Setup SSE headers

@@ -24,6 +24,13 @@ export function useDocuments(notebookId?: string) {
   });
 }
 
+export function useModels() {
+  return useQuery<{ id: string; provider: string; name: string }[], Error>({
+    queryKey: ["models"],
+    queryFn: () => api.getModels(),
+  });
+}
+
 export function useChatHistory(notebookId?: string) {
   return useQuery({
     queryKey: ["chatHistory", notebookId],
@@ -107,9 +114,9 @@ export function useDocument(documentId?: string | null) {
 
 export function useGenerateStudio(notebookId: string) {
   const queryClient = useQueryClient();
-  return useMutation<DocumentItem, Error, { feature: string; customParams?: Record<string, any> }>({
-    mutationFn: ({ feature, customParams }) =>
-      api.generateStudioOutput(notebookId, feature, { customParams }),
+  return useMutation<DocumentItem, Error, { feature: string; customParams?: Record<string, any>; selectedModelId?: string | null }>({
+    mutationFn: ({ feature, customParams, selectedModelId }) =>
+      api.generateStudioOutput(notebookId, feature, { customParams, selectedModelId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["documents", notebookId] });
     },

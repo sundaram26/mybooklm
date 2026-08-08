@@ -12,6 +12,7 @@ import { globalErrorHandler } from "./api/middlewares/error.middleware";
 import { notebookRoutes } from "./api/routes/notebook.routes";
 import { documentRoutes } from "./api/routes/document.routes";
 import { chatRoutes } from "./api/routes/chat.routes";
+import { modelRoutes } from "./api/routes/model.routes";
 import { IngestionProcessor, ingestionWorker } from "./core/ingestion/ingestion.processor";
 import { createRateLimiter } from "./api/middlewares/rate-limit.middleware";
 
@@ -47,6 +48,9 @@ const ingestLimit = createRateLimiter({ max: 300, windowMs: 60 * 1000 });     //
 app.use("/api/notebooks", standardLimit, notebookRoutes);
 app.use("/api/notebooks", ingestLimit, documentRoutes);
 app.use("/api/notebooks", chatLimit, chatRoutes);
+
+// Mount Models route
+app.use("/api/models", modelRoutes);
 
 app.get("/", (req: Request, res: Response) => {
     res.send("NotebookLM Backend is running!");

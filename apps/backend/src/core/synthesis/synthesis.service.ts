@@ -14,12 +14,13 @@ export interface SynthesisResponse {
 export interface SynthesisOptions {
     useHyde?: boolean;
     limit?: number;
+    selectedModelId?: string;
 }
 
 export class SynthesisService {
 
-    private static getLLM() {
-        return LLMManager.getLLM("medium");
+    private static getLLM(selectedModelId?: string) {
+        return LLMManager.getLLM("medium", selectedModelId);
     }
 
     /**
@@ -92,7 +93,7 @@ ${formattedSources}
         const messages = this.prepareMessages(query, history, sources);
 
         // 3. Call LLM
-        const llm = this.getLLM();
+        const llm = this.getLLM(options.selectedModelId);
         console.log(`[Synthesis] Generating grounded answer using LLM: ${llm.modelId}`);
         const responseText = await llm.provider.generateText(llm.modelId, messages);
 
@@ -133,7 +134,7 @@ ${formattedSources}
         const messages = this.prepareMessages(query, history, sources);
 
         // 3. Stream from LLM
-        const llm = this.getLLM();
+        const llm = this.getLLM(options.selectedModelId);
         console.log(`[Synthesis] Streaming grounded answer from LLM: ${llm.modelId}`);
         const textStream = llm.provider.streamText(llm.modelId, messages);
 

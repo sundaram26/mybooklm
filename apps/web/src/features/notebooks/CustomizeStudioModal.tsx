@@ -12,7 +12,7 @@ export function CustomizeStudioModal({
   feature: string | null;
   onClose: () => void;
 }) {
-  const { selectedNotebook, setSelectedDocumentId, setCenterPanelMode } = useWorkspaceStore();
+  const { selectedNotebook, setSelectedDocumentId, setCenterPanelMode, selectedModelId } = useWorkspaceStore();
   const notebookId = selectedNotebook?.id || "";
   
   const generateStudioMutation = useGenerateStudio(notebookId);
@@ -58,7 +58,8 @@ export function CustomizeStudioModal({
     try {
       const doc = await generateStudioMutation.mutateAsync({
         feature,
-        customParams
+        customParams,
+        selectedModelId
       });
       setSelectedDocumentId(doc.id);
       if (doc.studioFeature) {

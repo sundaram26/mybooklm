@@ -10,6 +10,7 @@ import { RetrievalService } from "../retrieval/retrieval.service";
 
 export interface StudioOptions {
     customParams?: Record<string, any> | undefined;
+    selectedModelId?: string;
 }
 
 const FEATURE_TITLES: Record<string, string> = {
@@ -26,8 +27,8 @@ const FEATURE_TITLES: Record<string, string> = {
 
 export class StudioService {
     
-    private static getLLM() {
-        return LLMManager.getLLM("high");
+    private static getLLM(selectedModelId?: string) {
+        return LLMManager.getLLM("high", selectedModelId);
     }
 
     static async generateStudioOutput(
@@ -168,7 +169,7 @@ export class StudioService {
         };
 
         // 4. Instantiate LLM provider
-        const llm = this.getLLM();
+        const llm = this.getLLM(options.selectedModelId);
         
         // Build Customization instructions
         let customInstruction = "";

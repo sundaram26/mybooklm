@@ -1,8 +1,9 @@
 import { ProviderFactory } from "./providers/provider.factory";
 import { env } from "../../config/env.config";
+import { SUPPORTED_MODELS } from "../../config/models";
 
 export class LLMManager {
-    static getLLM(tier: "mini" | "medium" | "high" = "medium") {
+    static getLLM(tier: "mini" | "medium" | "high" = "medium", selectedModelId?: string) {
 
 
         // 2. Fallback to server-side tier-specific defaults
@@ -22,7 +23,13 @@ export class LLMManager {
             defaultModelId = env.HIGH_MODEL || "";
         }
 
-        // If the tier-specific provider is "default", resolve the first available configured API key
+        // 3. User Override
+        if (tier !== "mini" && selectedModelId && SUPPORTED_MODELS[selectedModelId]) {
+            defaultProvider = SUPPORTED_MODELS[selectedModelId].provider;
+            defaultModelId = selectedModelId;
+        }
+
+        // 4. Resolve Provider Credentials
         if (defaultProvider === "default") {
             const geminiKey = env.GEMINI_API_KEY;
             const openaiKey = env.OPENAI_API_KEY;

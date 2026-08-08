@@ -96,12 +96,13 @@ export const documentsApi = {
   async generateStudioOutput(
     notebookId: string,
     feature: string,
-    options?: { customParams?: Record<string, any> }
+    options?: { customParams?: Record<string, any>; selectedModelId?: string | null }
   ): Promise<DocumentItem> {
     try {
       const response = await axiosClient.post(`/notebooks/${notebookId}/studio`, {
         feature,
         customParams: options?.customParams,
+        selectedModelId: options?.selectedModelId,
       });
       return response.data?.data;
     } catch (err: any) {

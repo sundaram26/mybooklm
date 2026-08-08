@@ -16,7 +16,7 @@ export function ChatInterface({ notebookId }: { notebookId: string }) {
   const user = session?.user;
   const isGuest = !user || (user as any).isAnonymous;
 
-  const { incrementGuestTurn } = useWorkspaceStore();
+  const { incrementGuestTurn, selectedModelId } = useWorkspaceStore();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
@@ -64,7 +64,7 @@ export function ChatInterface({ notebookId }: { notebookId: string }) {
     try {
       await api.streamChat(
         notebookId, queryText,
-        { parentId: activeParentId },
+        { parentId: activeParentId, selectedModelId },
         chunk => setMessages(prev => prev.map(m => m.id === tempAssistant.id ? { ...m, content: m.content + chunk } : m)),
         (fullText, metadata) => {
           setIsStreaming(false);

@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { Search, Plus, Key, ChevronRight } from "lucide-react";
+import { Search, Plus, Key, ChevronRight, ChevronDown } from "lucide-react";
 import { useWorkspaceStore } from "../../store/workspaceStore";
+import { useModels } from "../../lib/hooks";
 
 interface HeaderProps {
   searchQuery: string;
@@ -13,7 +14,19 @@ export function Header({ searchQuery, onSearchChange }: HeaderProps) {
   const {
     selectedNotebook, setSelectedNotebook, setCurrentView,
     setCreateModalOpen, setCenterPanelMode, setSelectedDocumentId,
+    selectedModelId, setSelectedModelId, availableModels, setAvailableModels,
   } = useWorkspaceStore();
+
+  const { data: modelsData } = useModels();
+
+  React.useEffect(() => {
+    if (modelsData && modelsData.length > 0) {
+      setAvailableModels(modelsData);
+      if (!selectedModelId && modelsData[0]) {
+        setSelectedModelId(modelsData[0].id);
+      }
+    }
+  }, [modelsData, selectedModelId, setAvailableModels, setSelectedModelId]);
 
   return (
     <header style={{
@@ -79,6 +92,34 @@ export function Header({ searchQuery, onSearchChange }: HeaderProps) {
           />
         </div>
 
+        {/* Model Selector */}
+        {availableModels.length > 0 && (
+          <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+            <select
+              value={selectedModelId || ""}
+              onChange={(e) => setSelectedModelId(e.target.value)}
+              style={{
+                appearance: "none",
+                background: "var(--bg-surface)",
+                border: "1px solid var(--border-subtle)",
+                borderRadius: "var(--radius-md)",
+                color: "var(--text-primary)",
+                fontSize: "0.75rem",
+                padding: "4px 24px 4px 10px",
+                cursor: "pointer",
+                outline: "none",
+                transition: "border-color var(--transition-fast)",
+              }}
+              onFocus={e => (e.target as HTMLSelectElement).style.borderColor = "var(--accent-orange)"}
+              onBlur={e => (e.target as HTMLSelectElement).style.borderColor = "var(--border-subtle)"}
+            >
+              {availableModels.map(m => (
+                <option key={m.id} value={m.id}>{m.name}</option>
+              ))}
+            </select>
+            <ChevronDown size={12} style={{ position: "absolute", right: "8px", pointerEvents: "none", color: "var(--text-subtle)" }} />
+          </div>
+        )}
 
         {/* Primary action */}
         {selectedNotebook ? (
