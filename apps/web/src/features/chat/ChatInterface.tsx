@@ -86,34 +86,29 @@ export function ChatInterface({ projectId }: { projectId: string }) {
   const userInitial = user?.name?.[0]?.toUpperCase() || "G";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "var(--bg-surface)" }}>
+    <div className="flex flex-col h-full bg-[var(--bg-surface)]">
       {/* Header */}
-      <div style={{
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "10px 16px",
-        borderBottom: "1px solid var(--border-subtle)",
-        flexShrink: 0,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <Sparkles size={13} style={{ color: "var(--text-subtle)" }} />
-          <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--text-primary)" }}>Chat</span>
+      <div className="flex items-center justify-between px-4 py-[10px] border-b border-[var(--border-subtle)] shrink-0">
+        <div className="flex items-center gap-[6px]">
+          <Sparkles size={13} className="text-[var(--text-subtle)]" />
+          <span className="text-[0.78rem] font-semibold text-[var(--text-primary)]">Chat</span>
         </div>
-        <span style={{ fontSize: "0.68rem", color: "var(--text-subtle)" }}>
+        <span className="text-[0.68rem] text-[var(--text-subtle)]">
           {documents.length} source{documents.length !== 1 ? "s" : ""} indexed
         </span>
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "20px 20px 8px", display: "flex", flexDirection: "column", gap: "16px", minHeight: 0 }}>
+      <div className="flex-1 overflow-y-auto px-5 pt-5 pb-2 flex flex-col gap-4 min-h-0">
         {messages.length === 0 ? (
-          <div style={{ color: "var(--text-secondary)", fontSize: "0.875rem", lineHeight: "1.6", maxWidth: "480px" }}>
-            <p style={{ fontSize: "1rem", fontWeight: 500, color: "var(--text-primary)", marginBottom: "12px" }}>
+          <div className="text-[var(--text-secondary)] text-[0.875rem] leading-[1.6] max-w-[480px]">
+            <p className="text-[1rem] font-medium text-[var(--text-primary)] mb-3">
               Topics in your sources come to life here.
             </p>
-            <p style={{ color: "var(--text-muted)", marginBottom: "6px", fontSize: "0.78rem", fontWeight: 500 }}>How to start:</p>
-            <ul style={{ paddingLeft: "16px", color: "var(--text-muted)", fontSize: "0.78rem", display: "flex", flexDirection: "column", gap: "4px" }}>
+            <p className="text-[var(--text-muted)] mb-[6px] text-[0.78rem] font-medium">How to start:</p>
+            <ul className="pl-4 text-[var(--text-muted)] text-[0.78rem] flex flex-col gap-1 list-disc">
               <li>Ask questions about your sources</li>
-              <li>Type <code style={{ background: "var(--bg-canvas)", padding: "1px 4px", borderRadius: "var(--radius-sm)", fontSize: "0.72rem", border: "1px solid var(--border-subtle)" }}>@</code> to reference specific sources</li>
+              <li>Type <code className="bg-[var(--bg-canvas)] px-1 py-[1px] rounded-[var(--radius-sm)] text-[0.72rem] border border-[var(--border-subtle)]">@</code> to reference specific sources</li>
               <li>Select a suggestion below to explore</li>
             </ul>
           </div>
@@ -121,57 +116,30 @@ export function ChatInterface({ projectId }: { projectId: string }) {
           messages.map(msg => (
             <div
               key={msg.id}
-              style={{
-                display: "flex", gap: "10px", alignItems: "flex-start",
-                maxWidth: "90%",
-                alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-                flexDirection: msg.role === "user" ? "row-reverse" : "row",
-              }}
+              className={`flex gap-[10px] items-start max-w-[90%] ${msg.role === 'user' ? 'self-end flex-row-reverse' : 'self-start flex-row'}`}
             >
               {/* Avatar */}
-              <div style={{
-                width: "24px", height: "24px", borderRadius: "50%", flexShrink: 0,
-                background: msg.role === "user" ? "var(--accent-orange)" : "var(--bg-canvas)",
-                border: "1px solid var(--border-subtle)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: "0.62rem", fontWeight: 700, color: msg.role === "user" ? "#fff" : "var(--text-muted)",
-              }}>
+              <div className={`w-6 h-6 rounded-full shrink-0 border border-[var(--border-subtle)] flex items-center justify-center text-[0.62rem] font-bold ${msg.role === 'user' ? 'bg-[var(--bg-surface)] text-[var(--text-primary)]' : 'bg-[var(--bg-canvas)] text-[var(--text-muted)]'}`}>
                 {msg.role === "user" ? userInitial : <Sparkles size={11} />}
               </div>
 
               {/* Bubble */}
-              <div style={{
-                borderRadius: "var(--radius-lg)",
-                padding: "10px 14px",
-                fontSize: "0.84rem", lineHeight: "1.6",
-                whiteSpace: "pre-wrap",
-                background: msg.role === "user" ? "var(--bg-canvas)" : "transparent",
-                border: msg.role === "user" ? "1px solid var(--border-subtle)" : "none",
-                color: msg.role === "user" ? "var(--text-primary)" : "var(--text-secondary)",
-              }}>
+              <div className={`rounded-[var(--radius-lg)] px-[14px] py-[10px] text-[0.84rem] leading-[1.6] whitespace-pre-wrap ${msg.role === 'user' ? 'bg-[var(--bg-canvas)] border border-[var(--border-subtle)] text-[var(--text-primary)]' : 'bg-transparent border-none text-[var(--text-secondary)]'}`}>
                 {msg.content || (isStreaming ? (
-                  <span style={{ display: "flex", gap: "3px", padding: "2px 0" }}>
+                  <span className="flex gap-[3px] py-[2px]">
                     {[0, 1, 2].map(i => (
-                      <span key={i} style={{
-                        width: "4px", height: "4px", borderRadius: "50%",
-                        background: "var(--text-subtle)",
-                        animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
-                        display: "inline-block",
-                      }} />
+                      <span key={i} className="w-1 h-1 rounded-full bg-[var(--text-subtle)] inline-block"
+                        style={{ animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite` }} />
                     ))}
                   </span>
                 ) : "")}
 
                 {/* Citations */}
                 {msg.citations && msg.citations.length > 0 && (
-                  <div style={{ marginTop: "10px", display: "flex", flexDirection: "column", gap: "5px" }}>
+                  <div className="mt-[10px] flex flex-col gap-[5px]">
                     {msg.citations.map((cite: any, idx: number) => (
-                      <div key={idx} style={{
-                        fontSize: "0.72rem", background: "var(--bg-canvas)",
-                        padding: "6px 10px", borderRadius: "var(--radius-md)",
-                        color: "var(--text-muted)", border: "1px solid var(--border-subtle)",
-                      }}>
-                        <strong style={{ color: "var(--text-secondary)" }}>[{cite.documentTitle}]:</strong>{" "}
+                      <div key={idx} className="text-[0.72rem] bg-[var(--bg-canvas)] px-[10px] py-[6px] rounded-[var(--radius-md)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
+                        <strong className="text-[var(--text-secondary)]">[{cite.documentTitle}]:</strong>{" "}
                         "{cite.snippet}"
                       </div>
                     ))}
@@ -180,17 +148,9 @@ export function ChatInterface({ projectId }: { projectId: string }) {
 
                 {/* Action icons for AI messages */}
                 {msg.role === "assistant" && !isStreaming && msg.content && (
-                  <div style={{ display: "flex", gap: "4px", marginTop: "8px" }}>
+                  <div className="flex gap-1 mt-2">
                     {[{ Icon: Pin }, { Icon: Copy }, { Icon: ThumbsUp }, { Icon: ThumbsDown }].map(({ Icon }, i) => (
-                      <button key={i} style={{
-                        padding: "3px", borderRadius: "var(--radius-sm)",
-                        background: "none", border: "none", cursor: "pointer",
-                        color: "var(--text-subtle)", display: "flex",
-                        transition: "all var(--transition-fast)",
-                      }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--bg-canvas)"; (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"; }}
-                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "none"; (e.currentTarget as HTMLElement).style.color = "var(--text-subtle)"; }}
-                      >
+                      <button key={i} className="p-[3px] rounded-[var(--radius-sm)] bg-transparent border-none cursor-pointer text-[var(--text-subtle)] flex transition-all hover:bg-[var(--bg-canvas)] hover:text-[var(--text-primary)]">
                         <Icon size={12} />
                       </button>
                     ))}
@@ -205,19 +165,12 @@ export function ChatInterface({ projectId }: { projectId: string }) {
 
       {/* Suggestion chips */}
       {!isStreaming && messages.length === 0 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", padding: "0 20px 10px", flexShrink: 0 }}>
+        <div className="flex flex-wrap gap-[6px] px-5 pb-[10px] shrink-0">
           {SUGGESTIONS.map(s => (
             <button
               key={s}
               onClick={() => handleSendQuery(s)}
-              style={{
-                padding: "5px 12px", fontSize: "0.75rem", fontWeight: 500,
-                background: "var(--bg-canvas)", border: "1px solid var(--border-subtle)",
-                color: "var(--text-muted)", borderRadius: "999px",
-                cursor: "pointer", transition: "all var(--transition-fast)",
-              }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--bg-surface-hover)"; (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "var(--bg-canvas)"; (e.currentTarget as HTMLElement).style.color = "var(--text-muted)"; }}
+              className="px-3 py-[5px] text-[0.75rem] font-medium bg-[var(--bg-canvas)] border border-[var(--border-subtle)] text-[var(--text-muted)] rounded-full cursor-pointer transition-all hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)]"
             >
               {s}
             </button>
@@ -226,18 +179,10 @@ export function ChatInterface({ projectId }: { projectId: string }) {
       )}
 
       {/* Input bar */}
-      <div style={{ padding: "10px 16px 14px", flexShrink: 0 }}>
+      <div className="px-4 pt-[10px] pb-[14px] shrink-0">
         <form
           onSubmit={e => { e.preventDefault(); if (input.trim()) handleSendQuery(input.trim()); }}
-          style={{
-            display: "flex", alignItems: "center", gap: "8px",
-            background: "var(--bg-canvas)",
-            border: "1px solid var(--border-subtle)",
-            borderRadius: "var(--radius-lg)", padding: "6px 6px 6px 14px",
-            transition: "border-color var(--transition-fast)",
-          }}
-          onFocus={e => (e.currentTarget as HTMLElement).style.borderColor = "var(--accent-orange)"}
-          onBlur={e => (e.currentTarget as HTMLElement).style.borderColor = "var(--border-subtle)"}
+          className="group flex items-center gap-2 bg-[var(--bg-canvas)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] pl-[14px] pr-[6px] py-[6px] transition-colors focus-within:border-[var(--accent-orange)]"
         >
           <input
             type="text"
@@ -245,36 +190,22 @@ export function ChatInterface({ projectId }: { projectId: string }) {
             value={input}
             onChange={e => setInput(e.target.value)}
             disabled={isStreaming}
-            style={{
-              flex: 1, background: "none", border: "none", outline: "none",
-              color: "var(--text-primary)", fontSize: "0.84rem",
-            }}
+            className="flex-1 bg-transparent border-none outline-none text-[var(--text-primary)] text-[0.84rem]"
           />
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
-            <span style={{
-              fontSize: "0.68rem", color: "var(--text-subtle)",
-              padding: "2px 7px", borderRadius: "var(--radius-sm)",
-              background: "var(--bg-surface)", border: "1px solid var(--border-subtle)",
-            }}>
+          <div className="flex items-center gap-[6px] shrink-0">
+            <span className="text-[0.68rem] text-[var(--text-subtle)] px-[7px] py-[2px] rounded-[var(--radius-sm)] bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
               {documents.length} src
             </span>
             <button
               type="submit"
               disabled={!input.trim() || isStreaming}
-              style={{
-                width: "28px", height: "28px", borderRadius: "50%",
-                background: input.trim() && !isStreaming ? "var(--accent-orange)" : "var(--bg-surface)",
-                border: "none", cursor: input.trim() && !isStreaming ? "pointer" : "not-allowed",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                color: input.trim() && !isStreaming ? "#fff" : "var(--text-subtle)",
-                transition: "all var(--transition-fast)",
-              }}
+              className={`w-7 h-7 rounded-full flex items-center justify-center transition-all border-none ${input.trim() && !isStreaming ? 'bg-[var(--accent-orange)] text-white cursor-pointer' : 'bg-[var(--bg-surface)] text-[var(--text-subtle)] cursor-not-allowed'}`}
             >
               <ArrowRight size={14} strokeWidth={2.5} />
             </button>
           </div>
         </form>
-        <p style={{ textAlign: "center", fontSize: "0.65rem", color: "var(--text-subtle)", marginTop: "6px" }}>
+        <p className="text-center text-[0.65rem] text-[var(--text-subtle)] mt-[6px]">
           AI can be inaccurate — double check responses.
         </p>
       </div>

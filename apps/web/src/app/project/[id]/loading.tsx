@@ -1,26 +1,22 @@
 export default function ProjectLoading() {
   return (
-    <div className="app-main" style={{ flexDirection: "row" }}>
+    <div className="app-main flex-row">
       {/* Sidebar Skeleton */}
-      <div style={{
-        width: "var(--sidebar-width)", height: "100%",
-        borderRight: "1px solid var(--border-subtle)", background: "var(--bg-surface)",
-        display: "flex", flexDirection: "column", padding: "16px"
-      }}>
-        <div className="skeleton" style={{ width: "80%", height: "24px", borderRadius: "var(--radius-md)", marginBottom: "24px" }} />
-        <div className="skeleton" style={{ width: "40%", height: "14px", borderRadius: "var(--radius-sm)", marginBottom: "12px" }} />
-        <div className="skeleton" style={{ width: "100%", height: "36px", borderRadius: "var(--radius-md)", marginBottom: "8px" }} />
-        <div className="skeleton" style={{ width: "100%", height: "36px", borderRadius: "var(--radius-md)", marginBottom: "8px" }} />
+      <div className="w-[var(--sidebar-width)] h-full border-r border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col p-4">
+        <div className="skeleton w-[80%] h-6 rounded-[var(--radius-md)] mb-6" />
+        <div className="skeleton w-[40%] h-[14px] rounded-[var(--radius-sm)] mb-3" />
+        <div className="skeleton w-full h-9 rounded-[var(--radius-md)] mb-2" />
+        <div className="skeleton w-full h-9 rounded-[var(--radius-md)] mb-2" />
       </div>
 
       {/* Center Panel Skeleton */}
-      <div style={{ flex: 1, height: "100%", display: "flex", flexDirection: "column", background: "var(--bg-canvas)" }}>
-        <div style={{ height: "52px", borderBottom: "1px solid var(--border-subtle)", padding: "0 16px", display: "flex", alignItems: "center" }}>
-           <div className="skeleton" style={{ width: "200px", height: "20px", borderRadius: "var(--radius-md)" }} />
+      <div className="flex-1 h-full flex flex-col bg-[var(--bg-canvas)]">
+        <div className="h-[52px] border-b border-[var(--border-subtle)] px-4 flex items-center">
+           <div className="skeleton w-[200px] h-5 rounded-[var(--radius-md)]" />
         </div>
-        <div style={{ flex: 1, padding: "24px" }}>
-           <div className="skeleton" style={{ width: "70%", height: "80px", borderRadius: "var(--radius-lg)", marginBottom: "16px", alignSelf: "flex-end" }} />
-           <div className="skeleton" style={{ width: "60%", height: "60px", borderRadius: "var(--radius-lg)" }} />
+        <div className="flex-1 p-6 flex flex-col">
+           <div className="skeleton w-[70%] h-[80px] rounded-[var(--radius-lg)] mb-4 self-end" />
+           <div className="skeleton w-[60%] h-[60px] rounded-[var(--radius-lg)]" />
         </div>
       </div>
     </div>

@@ -11,14 +11,14 @@ export default function SourcesPage() {
   const router = useRouter();
 
   return (
-    <div style={{ flex: 1, background: "var(--bg-surface)", borderRadius: "var(--radius-lg)", border: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      <div style={{ padding: "16px", borderBottom: "1px solid var(--border-subtle)", display: "flex", alignItems: "center", gap: "12px" }}>
-         <button onClick={() => router.push(`/project/${projectId}`)} className="btn btn-ghost" style={{ padding: "4px" }}>
+    <div className="flex-1 bg-[var(--bg-surface)] rounded-[var(--radius-lg)] border border-[var(--border-subtle)] flex flex-col overflow-hidden">
+      <div className="p-4 border-b border-[var(--border-subtle)] flex items-center gap-3">
+         <button onClick={() => router.push(`/project/${projectId}`)} className="btn btn-ghost p-1">
             <ArrowLeft size={16} />
          </button>
-         <h2 style={{ fontSize: "1rem", fontWeight: 600 }}>All Sources</h2>
+         <h2 className="text-[1rem] font-semibold">All Sources</h2>
       </div>
-      <div style={{ padding: "24px", overflowY: "auto", flex: 1 }}>
+      <div className="p-6 overflow-y-auto flex-1">
          <SourceList projectId={projectId} />
       </div>
     </div>

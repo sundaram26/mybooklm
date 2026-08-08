@@ -15,13 +15,10 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <div style={{
-      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-      height: "100vh", background: "var(--bg-canvas)", color: "var(--text-primary)", padding: "24px"
-    }}>
-      <AlertCircle size={48} style={{ color: "var(--status-error-text)", marginBottom: "24px" }} />
-      <h2 style={{ fontSize: "1.2rem", fontWeight: 600, marginBottom: "12px" }}>Something went wrong!</h2>
-      <p style={{ color: "var(--text-secondary)", marginBottom: "24px", maxWidth: "400px", textAlign: "center" }}>
+    <div className="flex flex-col items-center justify-center h-[100vh] bg-[var(--bg-canvas)] text-[var(--text-primary)] p-6">
+      <AlertCircle size={48} className="text-[var(--status-error-text)] mb-6" />
+      <h2 className="text-[1.2rem] font-semibold mb-3">Something went wrong!</h2>
+      <p className="text-[var(--text-secondary)] mb-6 max-w-[400px] text-center">
         {error.message || "An unexpected error occurred."}
       </p>
       <button

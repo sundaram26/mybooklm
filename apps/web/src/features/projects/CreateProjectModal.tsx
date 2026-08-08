@@ -37,103 +37,74 @@ export function CreateProjectModal({ isOpen, onClose }: { isOpen: boolean; onClo
     }
   };
 
-  const fieldStyle: React.CSSProperties = {
-    width: "100%", padding: "7px 10px",
-    borderRadius: "var(--radius-md)",
-    border: "1px solid var(--border-subtle)",
-    background: "var(--bg-canvas)",
-    color: "var(--text-primary)", fontSize: "0.8125rem",
-    outline: "none", transition: "border-color var(--transition-fast)",
-  };
+  const inputClasses = "w-full px-[10px] py-[7px] rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-canvas)] text-[var(--text-primary)] text-[0.8125rem] outline-none transition-colors focus:border-[var(--accent-orange)]";
 
   return (
     <div
       onClick={handleClose}
-      style={{
-        position: "fixed", inset: 0, zIndex: 1000,
-        background: "rgba(0,0,0,0.65)", backdropFilter: "blur(3px)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        animation: "fadeIn 120ms ease-out",
-      }}
+      className="fixed inset-0 z-[1000] bg-[rgba(0,0,0,0.65)] backdrop-blur-[3px] flex items-center justify-center animate-[fadeIn_120ms_ease-out]"
     >
       <div
         onClick={e => e.stopPropagation()}
-        style={{
-          width: "100%", maxWidth: "420px",
-          background: "var(--bg-surface)",
-          border: "1px solid var(--border-subtle)",
-          borderRadius: "var(--radius-xl)",
-          boxShadow: "var(--shadow-lg)",
-          animation: "slideUp 150ms ease-out",
-          overflow: "hidden",
-        }}
+        className="w-full max-w-[420px] bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-xl)] shadow-[var(--shadow-lg)] animate-[slideUp_150ms_ease-out] overflow-hidden"
       >
         {/* Header */}
-        <div style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "14px 18px",
-          borderBottom: "1px solid var(--border-subtle)",
-        }}>
-          <h3 style={{ fontSize: "0.875rem", fontWeight: "600", color: "var(--text-primary)" }}>
+        <div className="flex items-center justify-between p-[14px_18px] border-b border-[var(--border-subtle)]">
+          <h3 className="text-[0.875rem] font-semibold text-[var(--text-primary)] font-[family-name:var(--font-heading)]">
             New Project
           </h3>
-          <button onClick={handleClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", display: "flex", padding: "2px" }}>
+          <button onClick={handleClose} className="flex p-[2px] bg-transparent border-none cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
             <X size={15} />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} style={{ padding: "18px" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <form onSubmit={handleSubmit} className="p-[18px]">
+          <div className="flex flex-col gap-3">
             <div>
-              <label style={{ display: "block", fontSize: "0.72rem", fontWeight: "500", color: "var(--text-secondary)", marginBottom: "5px" }}>
-                Name <span style={{ color: "var(--status-error-text)" }}>*</span>
+              <label className="block text-[0.72rem] font-medium text-[var(--text-secondary)] mb-[5px]">
+                Name <span className="text-[var(--status-error-text)]">*</span>
               </label>
               <input
                 type="text" required autoFocus
                 placeholder="e.g. Gut Health Research"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                style={fieldStyle}
-                onFocus={e => (e.target as HTMLInputElement).style.borderColor = "var(--accent-orange)"}
-                onBlur={e => (e.target as HTMLInputElement).style.borderColor = "var(--border-subtle)"}
+                className={inputClasses}
               />
             </div>
 
             <div>
-              <label style={{ display: "block", fontSize: "0.72rem", fontWeight: "500", color: "var(--text-secondary)", marginBottom: "5px" }}>
-                Description <span style={{ color: "var(--text-subtle)", fontWeight: "400" }}>(optional)</span>
+              <label className="block text-[0.72rem] font-medium text-[var(--text-secondary)] mb-[5px]">
+                Description <span className="text-[var(--text-subtle)] font-normal">(optional)</span>
               </label>
               <textarea
                 rows={2} placeholder="Brief context or purpose..."
                 value={description}
                 onChange={e => setDescription(e.target.value)}
-                style={{ ...fieldStyle, resize: "none", lineHeight: "1.5" }}
-                onFocus={e => (e.target as HTMLTextAreaElement).style.borderColor = "var(--accent-orange)"}
-                onBlur={e => (e.target as HTMLTextAreaElement).style.borderColor = "var(--border-subtle)"}
+                className={`${inputClasses} resize-none leading-[1.5]`}
               />
             </div>
 
             {error && (
-              <p style={{ fontSize: "0.76rem", color: "var(--status-error-text)", padding: "7px 10px", background: "var(--status-error-bg)", borderRadius: "var(--radius-md)" }}>
+              <p className="text-[0.76rem] text-[var(--status-error-text)] px-[10px] py-[7px] bg-[var(--status-error-bg)] rounded-[var(--radius-md)]">
                 {error}
               </p>
             )}
           </div>
 
           {/* Footer */}
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px", marginTop: "18px", paddingTop: "14px", borderTop: "1px solid var(--border-subtle)" }}>
+          <div className="flex justify-end gap-2 mt-[18px] pt-[14px] border-t border-[var(--border-subtle)]">
             <button type="button" onClick={handleClose} className="btn btn-secondary">
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || !title.trim()}
-              className="btn btn-primary"
-              style={{ opacity: loading || !title.trim() ? 0.6 : 1 }}
+              className={`btn btn-primary ${(loading || !title.trim()) ? 'opacity-60' : 'opacity-100'}`}
             >
               {loading ? (
-                <span style={{ width: "13px", height: "13px", borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", animation: "spin 0.7s linear infinite", display: "inline-block" }} />
+                <span className="w-[13px] h-[13px] rounded-full border-2 border-[rgba(255,255,255,0.3)] border-t-[#fff] animate-[spin_0.7s_linear_infinite] inline-block" />
               ) : null}
               {loading ? "Creating..." : "Create"}
             </button>

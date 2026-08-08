@@ -26,123 +26,71 @@ export function AppTopBar({ searchQuery, onSearchChange }: AppTopBarProps) {
   ] as const;
 
   return (
-    <header style={{
-      height: "52px",
-      borderBottom: "1px solid var(--border-subtle)",
-      background: "var(--bg-canvas)",
-      display: "flex", alignItems: "center",
-      justifyContent: "space-between",
-      padding: "0 24px", flexShrink: 0,
-    }}>
+    <header className="flex items-center justify-between h-[52px] px-6 shrink-0 bg-[var(--bg-canvas)] border-b border-[var(--border-subtle)]">
       {/* Left: Logo */}
       <button
         onClick={() => { router.push("/"); }}
-        style={{
-          display: "flex", alignItems: "center", gap: "7px",
-          background: "none", border: "none", cursor: "pointer", padding: "0",
-        }}
+        className="flex items-center gap-[7px] bg-transparent border-none cursor-pointer p-0"
       >
-        <div style={{
-          width: "20px", height: "20px", borderRadius: "4px",
-          background: "var(--accent-orange)", display: "flex",
-          alignItems: "center", justifyContent: "center", flexShrink: 0,
-        }}>
-          <span style={{ color: "#fff", fontSize: "10px", fontWeight: "800" }}>N</span>
+        <div className="flex items-center justify-center shrink-0 w-5 h-5 rounded bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
+          <span className="text-[10px] font-extrabold text-[var(--accent-orange)]">N</span>
         </div>
-        <span style={{ fontSize: "0.875rem", fontWeight: "700", color: "var(--text-primary)", letterSpacing: "-0.02em" }}>
+        <span className="text-sm font-bold text-[var(--text-primary)] tracking-[-0.02em] font-[family-name:var(--font-heading)]">
           noetalm
         </span>
       </button>
 
       {/* Center: Search */}
-      <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-        <Search size={12} style={{
-          position: "absolute", left: "9px",
-          color: "var(--text-subtle)", pointerEvents: "none",
-        }} />
+      <div className="relative flex items-center">
+        <Search size={12} className="absolute left-[9px] text-[var(--text-subtle)] pointer-events-none" />
         <input
           type="text"
           placeholder="Search notebooks..."
           value={searchQuery}
           onChange={e => onSearchChange(e.target.value)}
-          style={{
-            padding: "5px 12px 5px 27px",
-            borderRadius: "var(--radius-md)",
-            border: "1px solid var(--border-subtle)",
-            background: "var(--bg-surface)",
-            color: "var(--text-primary)",
-            fontSize: "0.78rem", outline: "none",
-            width: "220px", transition: "all var(--transition-fast)",
-          }}
-          onFocus={e => {
-            (e.target as HTMLInputElement).style.borderColor = "var(--accent-orange)";
-            (e.target as HTMLInputElement).style.width = "260px";
-          }}
-          onBlur={e => {
-            (e.target as HTMLInputElement).style.borderColor = "var(--border-subtle)";
-            (e.target as HTMLInputElement).style.width = "220px";
-          }}
+          className="w-[220px] focus:w-[260px] py-[5px] pr-[12px] pl-[27px] rounded-[var(--radius-md)] border border-[var(--border-subtle)] focus:border-[var(--accent-orange)] bg-[var(--bg-surface)] text-[var(--text-primary)] text-[0.78rem] outline-none transition-all"
         />
       </div>
 
       {/* Right: Controls */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      <div className="flex items-center gap-2">
 
         {/* Theme switcher */}
-        <div style={{
-          display: "flex", gap: "1px",
-          background: "var(--bg-surface)",
-          border: "1px solid var(--border-subtle)",
-          borderRadius: "var(--radius-md)", padding: "2px",
-        }}>
+        <div className="flex gap-[1px] p-[2px] rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
           {THEMES.map(({ v, Icon }) => (
             <button
               key={v}
               title={v}
               onClick={() => setTheme(v)}
-              style={{
-                display: "flex", alignItems: "center", justifyContent: "center",
-                padding: "4px 7px", borderRadius: "calc(var(--radius-md) - 2px)",
-                border: "none", cursor: "pointer",
-                background: theme === v ? "var(--bg-canvas)" : "transparent",
-                color: theme === v ? "var(--text-primary)" : "var(--text-subtle)",
-                transition: "all var(--transition-fast)",
-              }}
+              className={`flex items-center justify-center py-1 px-[7px] rounded-[calc(var(--radius-md)-2px)] border-none cursor-pointer transition-all ${theme === v ? 'bg-[var(--bg-canvas)] text-[var(--text-primary)]' : 'bg-transparent text-[var(--text-subtle)]'}`}
             >
               <Icon size={12} />
             </button>
           ))}
         </div>
 
-
-
         {/* Divider */}
-        <div style={{ width: "1px", height: "20px", background: "var(--border-subtle)" }} />
+        <div className="w-[1px] h-5 bg-[var(--border-subtle)]" />
 
         {/* User */}
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <div style={{
-            width: "24px", height: "24px", borderRadius: "50%",
-            background: "var(--accent-orange)",
-            color: "#fff", display: "flex", alignItems: "center",
-            justifyContent: "center", fontSize: "0.65rem", fontWeight: "700", flexShrink: 0,
-          }}>
+        <div className="flex items-center gap-[6px]">
+          <div className="flex items-center justify-center shrink-0 w-6 h-6 rounded-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-[0.65rem] font-bold">
             {user?.name?.[0]?.toUpperCase() || "G"}
           </div>
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontSize: "0.75rem", fontWeight: "500", color: "var(--text-primary)", lineHeight: 1.2 }}>
+          <div className="flex flex-col">
+            <span className="text-[0.75rem] font-medium text-[var(--text-primary)] leading-[1.2]">
               {user?.name || "Guest"}
             </span>
-            <span style={{ fontSize: "0.65rem", color: "var(--text-subtle)", lineHeight: 1.2 }}>
+            <span className="text-[0.65rem] text-[var(--text-subtle)] leading-[1.2]">
               {user?.email || "guest mode"}
             </span>
           </div>
           {user && !(user as any).isAnonymous ? (
-            <button onClick={() => signOut()} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-subtle)", display: "flex", padding: "2px" }}>
+            <button onClick={() => signOut()} className="flex p-[2px] bg-transparent border-none cursor-pointer text-[var(--text-subtle)] hover:text-[var(--text-primary)] transition-colors">
               <LogOut size={13} />
             </button>
           ) : (
-            <button onClick={() => setAuthModalOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--accent-orange)", display: "flex", padding: "2px" }}>
+            <button onClick={() => setAuthModalOpen(true)} className="flex p-[2px] bg-transparent border-none cursor-pointer text-[var(--accent-orange)] hover:opacity-80 transition-opacity">
               <LogIn size={13} />
             </button>
           )}

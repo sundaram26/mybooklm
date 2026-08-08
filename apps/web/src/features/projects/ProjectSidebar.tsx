@@ -33,40 +33,22 @@ export function ProjectSidebar({ projectId }: { projectId: string }) {
   };
 
   return (
-    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", background: "var(--bg-surface)" }}>
+    <div className="w-full h-full flex flex-col bg-[var(--bg-surface)]">
       {/* Header */}
-      <div style={{
-        padding: "12px 14px 10px",
-        borderBottom: "1px solid var(--border-subtle)",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-      }}>
-        <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--text-primary)", letterSpacing: "0.01em" }}>
+      <div className="p-[12px_14px_10px] border-b border-[var(--border-subtle)] flex items-center justify-between">
+        <span className="text-[0.78rem] font-semibold text-[var(--text-primary)] tracking-[0.01em]">
           Sources
         </span>
-        <span style={{
-          fontSize: "0.68rem", color: "var(--text-subtle)",
-          background: "var(--bg-canvas)", border: "1px solid var(--border-subtle)",
-          padding: "1px 6px", borderRadius: "var(--radius-sm)",
-        }}>
+        <span className="text-[0.68rem] text-[var(--text-subtle)] bg-[var(--bg-canvas)] border border-[var(--border-subtle)] px-[6px] py-[1px] rounded-[var(--radius-sm)]">
           {documents.length}
         </span>
       </div>
 
       {/* Add source button */}
-      <div style={{ padding: "10px 12px 8px", display: "flex", gap: "6px" }}>
+      <div className="p-[10px_12px_8px] flex gap-[6px]">
         <button
           onClick={() => { setCenterPanelMode("add-source"); setSelectedDocumentId(null); }}
-          style={{
-            flex: 1, padding: "6px 0",
-            borderRadius: "var(--radius-md)",
-            border: "1px solid var(--border-medium)",
-            background: "transparent", color: "var(--text-secondary)",
-            fontSize: "0.78rem", fontWeight: 500,
-            display: "flex", alignItems: "center", justifyContent: "center", gap: "5px",
-            cursor: "pointer", transition: "all var(--transition-fast)",
-          }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--bg-canvas)"; (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--text-secondary)"; }}
+          className="flex-1 py-[6px] rounded-[var(--radius-md)] border border-[var(--border-medium)] bg-transparent text-[var(--text-secondary)] text-[0.78rem] font-medium flex items-center justify-center gap-[5px] cursor-pointer transition-colors hover:bg-[var(--bg-canvas)] hover:text-[var(--text-primary)]"
         >
           <Plus size={13} />
           Add sources
@@ -83,14 +65,7 @@ export function ProjectSidebar({ projectId }: { projectId: string }) {
                 setCenterPanelMode("chat");
               }
             }}
-            style={{
-              padding: "6px 10px",
-              borderRadius: "var(--radius-md)",
-              border: "1px solid var(--status-error-bg)",
-              background: "var(--status-error-bg)", color: "var(--status-error-text)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", transition: "all var(--transition-fast)",
-            }}
+            className="px-[10px] py-[6px] rounded-[var(--radius-md)] border border-[var(--status-error-bg)] bg-[var(--status-error-bg)] text-[var(--status-error-text)] flex items-center justify-center cursor-pointer transition-colors"
             title="Clear all sources"
           >
             <Trash2 size={13} />
@@ -99,62 +74,47 @@ export function ProjectSidebar({ projectId }: { projectId: string }) {
       </div>
 
       {/* Document list */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "0 8px 8px" }}>
+      <div className="flex-1 overflow-y-auto px-2 pb-2">
         
         {documents.length > 0 && (
-          <div style={{ padding: "4px", marginBottom: "8px" }}>
-            <div style={{ position: "relative" }}>
-              <Search size={12} style={{ position: "absolute", left: "8px", top: "50%", transform: "translateY(-50%)", color: "var(--text-subtle)" }} />
+          <div className="p-1 mb-2">
+            <div className="relative">
+              <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
               <input
                 type="text"
                 placeholder="Search sources..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: "100%", padding: "4px 8px 4px 26px",
-                  borderRadius: "var(--radius-sm)",
-                  border: "1px solid var(--border-subtle)",
-                  background: "var(--bg-canvas)",
-                  color: "var(--text-primary)",
-                  fontSize: "0.75rem"
-                }}
+                className="w-full pl-[26px] pr-2 py-1 rounded-[var(--radius-sm)] border border-[var(--border-subtle)] bg-[var(--bg-canvas)] text-[var(--text-primary)] text-[0.75rem]"
               />
             </div>
           </div>
         )}
 
         {isLoading ? (
-          <div style={{ display: "flex", justifyContent: "center", padding: "24px 0" }}>
-            <Loader2 size={16} style={{ color: "var(--text-subtle)", animation: "spin 1s linear infinite" }} />
+          <div className="flex justify-center py-6">
+            <Loader2 size={16} className="text-[var(--text-subtle)] animate-[spin_1s_linear_infinite]" />
           </div>
         ) : documents.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "28px 16px" }}>
-            <div style={{
-              width: "36px", height: "44px", margin: "0 auto 12px",
-              border: "1.5px dashed var(--border-medium)", borderRadius: "var(--radius-md)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <FileText size={16} style={{ color: "var(--text-subtle)" }} />
+          <div className="text-center py-7 px-4">
+            <div className="w-[36px] h-[44px] mx-auto mb-3 border-[1.5px] border-dashed border-[var(--border-medium)] rounded-[var(--radius-md)] flex items-center justify-center">
+              <FileText size={16} className="text-[var(--text-subtle)]" />
             </div>
-            <p style={{ fontSize: "0.78rem", fontWeight: 500, color: "var(--text-secondary)", marginBottom: "4px" }}>
+            <p className="text-[0.78rem] font-medium text-[var(--text-secondary)] mb-1">
               No sources yet
             </p>
-            <p style={{ fontSize: "0.72rem", color: "var(--text-subtle)", lineHeight: "1.5", marginBottom: "10px" }}>
+            <p className="text-[0.72rem] text-[var(--text-subtle)] leading-[1.5] mb-[10px]">
               Add files, websites, or more to ground your AI.
             </p>
             <button
               onClick={() => setCenterPanelMode("add-source")}
-              style={{
-                fontSize: "0.72rem", color: "var(--accent-orange)",
-                background: "none", border: "none", cursor: "pointer",
-                textDecoration: "underline", textDecorationColor: "rgba(232,82,31,0.3)",
-              }}
+              className="text-[0.72rem] text-[var(--accent-orange)] bg-transparent border-none cursor-pointer underline decoration-[rgba(232,82,31,0.3)]"
             >
               Add a source
             </button>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
+          <div className="flex flex-col gap-[1px]">
             {(() => {
               const filteredDocs = documents.filter(doc => 
                 (doc.title || "").toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -172,15 +132,15 @@ export function ProjectSidebar({ projectId }: { projectId: string }) {
                 const isExpanded = folder === "General" || expandedFolders[folder] !== false; // expanded by default
                 
                 return (
-                <div key={folder} style={{ marginBottom: "8px" }}>
+                <div key={folder} className="mb-2">
                   {folder !== "General" && (
                     <div 
                       onClick={() => setExpandedFolders(prev => ({ ...prev, [folder]: !isExpanded }))}
-                      style={{ display: "flex", alignItems: "center", gap: "4px", padding: "4px 8px", color: "var(--text-subtle)", fontSize: "0.7rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.02em", cursor: "pointer", userSelect: "none" }}
+                      className="flex items-center gap-1 px-2 py-1 text-[var(--text-subtle)] text-[0.7rem] font-semibold uppercase tracking-[0.02em] cursor-pointer select-none"
                     >
                       {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
                       <Folder size={10} />
-                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{folder.split('/').pop()}</span>
+                      <span className="overflow-hidden text-ellipsis whitespace-nowrap flex-1">{folder.split('/').pop()}</span>
                     </div>
                   )}
                   {isExpanded && docs.map((doc: any) => {
@@ -191,13 +151,7 @@ export function ProjectSidebar({ projectId }: { projectId: string }) {
                     return (
                       <div
                         key={doc.id}
-                        style={{
-                          display: "flex", alignItems: "center", gap: "7px",
-                          padding: "6px 8px", borderRadius: "var(--radius-md)",
-                          background: isSelected ? "var(--bg-canvas)" : "transparent",
-                          border: `1px solid ${isSelected ? "var(--border-medium)" : "transparent"}`,
-                          cursor: "pointer", transition: "all var(--transition-fast)",
-                        }}
+                        className={`group flex items-center gap-[7px] px-2 py-[6px] rounded-[var(--radius-md)] border cursor-pointer transition-colors ${isSelected ? 'bg-[var(--bg-canvas)] border-[var(--border-medium)]' : 'bg-transparent border-transparent hover:bg-[var(--bg-canvas)]'}`}
                         onClick={() => { 
                           setSelectedDocumentId(doc.id); 
                           if (doc.studioFeature) {
@@ -206,22 +160,16 @@ export function ProjectSidebar({ projectId }: { projectId: string }) {
                             setCenterPanelMode("chat");
                           }
                         }}
-                        onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = "var(--bg-canvas)"; }}
-                        onMouseLeave={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                       >
-                        <span style={{ color: isSelected ? "var(--accent-orange)" : "var(--text-subtle)", flexShrink: 0 }}>
+                        <span className={`shrink-0 ${isSelected ? 'text-[var(--accent-orange)]' : 'text-[var(--text-subtle)]'}`}>
                           {getDocIcon(doc)}
                         </span>
-                        <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
-                          <span style={{
-                            fontSize: "0.78rem", fontWeight: isSelected ? 500 : 400,
-                            color: isSelected ? "var(--text-primary)" : "var(--text-secondary)",
-                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                          }}>
+                        <div className="flex-1 overflow-hidden flex flex-col">
+                          <span className={`text-[0.78rem] truncate ${isSelected ? 'font-medium text-[var(--text-primary)]' : 'font-normal text-[var(--text-secondary)]'}`}>
                             {doc.title}
                           </span>
                           {isPending && doc.progressMessage && (
-                            <span style={{ fontSize: "0.65rem", color: "var(--status-warning-text)", marginTop: "1px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                            <span className="text-[0.65rem] text-[var(--status-warning-text)] mt-[1px] truncate">
                               {doc.progressMessage}
                             </span>
                           )}
@@ -229,12 +177,8 @@ export function ProjectSidebar({ projectId }: { projectId: string }) {
                         {/* Status dot */}
                         <span 
                           title={isPending ? (doc.progressMessage || "Processing...") : isFailed ? "Failed" : "Ready"}
-                          style={{
-                            width: "5px", height: "5px", borderRadius: "50%", flexShrink: 0,
-                            background: isPending ? "#FBBF24" : isFailed ? "var(--status-error-text)" : "#34D399",
-                            animation: isPending ? "pulse 1.5s ease-in-out infinite" : "none",
-                            cursor: "help",
-                        }} />
+                          className={`w-[5px] h-[5px] rounded-full shrink-0 cursor-help ${isPending ? 'bg-[#FBBF24] animate-[pulse_1.5s_ease-in-out_infinite]' : isFailed ? 'bg-[var(--status-error-text)]' : 'bg-[#34D399]'}`}
+                        />
                         {/* Delete on hover */}
                         <button
                           onClick={async e => {
@@ -244,16 +188,7 @@ export function ProjectSidebar({ projectId }: { projectId: string }) {
                               if (isSelected) setSelectedDocumentId(null);
                             }
                           }}
-                          style={{
-                            background: "none", border: "none", cursor: "pointer",
-                            color: "var(--text-subtle)", padding: "2px", display: "flex",
-                            opacity: 0, transition: "opacity var(--transition-fast)",
-                            flexShrink: 0,
-                          }}
-                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = "var(--status-error-text)"; }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = "var(--text-subtle)"; }}
-                          onFocus={e => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
-                          onBlur={e => { (e.currentTarget as HTMLElement).style.opacity = "0"; }}
+                          className="flex p-[2px] bg-transparent border-none cursor-pointer text-[var(--text-subtle)] hover:text-[var(--status-error-text)] opacity-0 group-hover:opacity-100 focus:opacity-100 shrink-0 transition-opacity"
                           title="Delete source"
                         >
                           <Trash2 size={13} />
@@ -267,9 +202,6 @@ export function ProjectSidebar({ projectId }: { projectId: string }) {
           </div>
         )}
       </div>
-
-
-      <style>{`.delete-btn { opacity: 0; } div:hover > .delete-btn { opacity: 1; }`}</style>
     </div>
   );
 }

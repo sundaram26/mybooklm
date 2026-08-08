@@ -1,19 +1,18 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Instrument_Serif } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "../globals.css";
 import { ThemeProvider } from "../components/theme-provider";
 import { QueryProvider } from "../components/providers/QueryProvider";
 import { Toaster } from "sonner";
 
-const jakartaSans = Plus_Jakarta_Sans({
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
-const instrumentSerif = Instrument_Serif({
-  weight: "400",
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-serif",
+  variable: "--font-heading",
 });
 
 export const metadata: Metadata = {
@@ -38,7 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${jakartaSans.variable} ${instrumentSerif.variable}`}>
+      <body className={`${inter.variable} ${spaceGrotesk.variable}`}>
         <QueryProvider>
           <ThemeProvider>
             {children}

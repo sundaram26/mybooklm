@@ -14,99 +14,50 @@ export function ProjectHeader({ project }: { project: Project }) {
   const { data: documents = [] } = useDocuments(project?.id);
 
   return (
-    <header style={{
-      height: "52px",
-      display: "flex", alignItems: "center",
-      justifyContent: "space-between",
-      padding: "0 16px",
-      background: "var(--bg-canvas)",
-      borderBottom: "1px solid var(--border-subtle)",
-      flexShrink: 0,
-    }}>
+    <header className="flex items-center justify-between px-4 h-[52px] bg-[var(--bg-canvas)] border-b border-[var(--border-subtle)] shrink-0">
       {/* Left: back + title */}
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", overflow: "hidden" }}>
+      <div className="flex items-center gap-[10px] overflow-hidden">
         <button
           onClick={() => { router.push("/"); }}
-          style={{
-            display: "flex", alignItems: "center", gap: "5px",
-            background: "none", border: "none", cursor: "pointer",
-            color: "var(--text-muted)", fontSize: "0.78rem", padding: "4px 6px",
-            borderRadius: "var(--radius-md)",
-            transition: "color var(--transition-fast)",
-            flexShrink: 0,
-          }}
-          onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"}
-          onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "var(--text-muted)"}
+          className="flex items-center gap-[5px] bg-transparent border-none cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-primary)] text-[0.78rem] py-1 px-[6px] rounded-[var(--radius-md)] transition-colors shrink-0"
         >
           <ChevronLeft size={14} />
           <span>Projects</span>
         </button>
 
-        <div style={{ width: "1px", height: "16px", background: "var(--border-subtle)", flexShrink: 0 }} />
+        <div className="w-[1px] h-4 bg-[var(--border-subtle)] shrink-0" />
 
-        <div style={{ display: "flex", alignItems: "center", gap: "7px", overflow: "hidden" }}>
-          <div style={{
-            width: "18px", height: "18px", borderRadius: "4px",
-            background: "var(--accent-orange)",
-            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-          }}>
+        <div className="flex items-center gap-[7px] overflow-hidden">
+          <div className="flex items-center justify-center shrink-0 w-[18px] h-[18px] rounded-[4px] bg-[var(--accent-orange)]">
             <BookOpen size={10} color="#fff" />
           </div>
-          <span style={{
-            fontSize: "0.84rem", fontWeight: 600, color: "var(--text-primary)",
-            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-          }}>
+          <span className="text-[0.84rem] font-semibold text-[var(--text-primary)] truncate">
             {project.title}
           </span>
         </div>
 
-        <span style={{
-          fontSize: "0.68rem", color: "var(--text-subtle)", flexShrink: 0,
-          padding: "2px 6px", borderRadius: "var(--radius-sm)",
-          background: "var(--bg-surface)", border: "1px solid var(--border-subtle)",
-        }}>
+        <span className="text-[0.68rem] text-[var(--text-subtle)] shrink-0 py-[2px] px-[6px] rounded-[var(--radius-sm)] bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
           {documents.length} source{documents.length !== 1 ? "s" : ""}
         </span>
       </div>
 
       {/* Right: actions */}
-      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+      <div className="flex items-center gap-[6px]">
         <button
-          style={{
-            display: "flex", alignItems: "center", gap: "5px",
-            background: "none", border: "1px solid var(--border-subtle)",
-            color: "var(--text-muted)", fontSize: "0.75rem",
-            padding: "4px 10px", borderRadius: "var(--radius-md)",
-            cursor: "pointer", transition: "all var(--transition-fast)",
-          }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--bg-surface)"; (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "none"; (e.currentTarget as HTMLElement).style.color = "var(--text-muted)"; }}
+          className="flex items-center gap-[5px] bg-transparent border border-[var(--border-subtle)] text-[var(--text-muted)] text-[0.75rem] py-1 px-[10px] rounded-[var(--radius-md)] cursor-pointer transition-all hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)]"
         >
           <Copy size={12} /> Copy
         </button>
         <button
-          style={{
-            display: "flex", alignItems: "center", gap: "5px",
-            background: "none", border: "1px solid var(--border-subtle)",
-            color: "var(--text-muted)", fontSize: "0.75rem",
-            padding: "4px 10px", borderRadius: "var(--radius-md)",
-            cursor: "pointer", transition: "all var(--transition-fast)",
-          }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "var(--bg-surface)"; (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "none"; (e.currentTarget as HTMLElement).style.color = "var(--text-muted)"; }}
+          className="flex items-center gap-[5px] bg-transparent border border-[var(--border-subtle)] text-[var(--text-muted)] text-[0.75rem] py-1 px-[10px] rounded-[var(--radius-md)] cursor-pointer transition-all hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)]"
         >
           <Settings size={12} /> Settings
         </button>
 
-        <div style={{ width: "1px", height: "16px", background: "var(--border-subtle)" }} />
+        <div className="w-[1px] h-4 bg-[var(--border-subtle)]" />
 
         {/* Avatar */}
-        <div style={{
-          width: "24px", height: "24px", borderRadius: "50%",
-          background: "var(--accent-orange)", color: "#fff",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: "0.65rem", fontWeight: 700,
-        }}>
+        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-[0.65rem] font-bold">
           {user?.name?.[0]?.toUpperCase() || "G"}
         </div>
       </div>

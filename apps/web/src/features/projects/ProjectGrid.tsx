@@ -32,92 +32,49 @@ export function ProjectGrid({ searchQuery = "" }: ProjectGridProps) {
     (nb.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
   );
 
-  // ─── styles ──────────────────────────────────────────────────────────────
-
-  const wrap: React.CSSProperties = {
-    flex: 1, overflowY: "auto",
-    background: "var(--bg-canvas)",
-  };
-
-  const inner: React.CSSProperties = {
-    maxWidth: "960px", margin: "0 auto",
-    padding: "28px 32px",
-  };
-
-  const pageTitle: React.CSSProperties = {
-    fontSize: "0.8125rem", fontWeight: "500",
-    color: "var(--text-secondary)", marginBottom: "20px",
-    display: "flex", alignItems: "center",
-    justifyContent: "space-between",
-  };
-
-  const table: React.CSSProperties = {
-    width: "100%",
-    border: "1px solid var(--border-subtle)",
-    borderRadius: "var(--radius-lg)",
-    overflow: "hidden",
-  };
-
-  const thead: React.CSSProperties = {
-    display: "grid",
-    gridTemplateColumns: "1fr 100px 90px 36px",
-    padding: "0 16px",
-    borderBottom: "1px solid var(--border-subtle)",
-    background: "var(--bg-surface)",
-  };
-
-  const th: React.CSSProperties = {
-    padding: "8px 0",
-    fontSize: "0.68rem", fontWeight: "600",
-    letterSpacing: "0.06em", textTransform: "uppercase",
-    color: "var(--text-subtle)",
-  };
-
   return (
-    <div style={wrap}>
-      <div style={inner}>
+    <div className="flex-1 overflow-y-auto bg-[var(--bg-canvas)]">
+      <div className="max-w-[960px] mx-auto py-7 px-8">
 
         {/* Page header */}
-        <div style={pageTitle}>
+        <div className="flex items-center justify-between text-[0.8125rem] font-medium text-[var(--text-secondary)] mb-5">
           <div>
-            <h1 style={{ fontSize: "1rem", fontWeight: "600", color: "var(--text-primary)", marginBottom: "2px" }}>
+            <h1 className="text-[1.25rem] font-semibold text-[var(--text-primary)] mb-[2px] font-[family-name:var(--font-heading)]">
               Projects
             </h1>
-            <p style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+            <p className="text-[0.8125rem] text-[var(--text-muted)]">
               {projects.length} project{projects.length !== 1 ? "s" : ""} · grounded AI research workspace
             </p>
           </div>
-          <button
-            onClick={() => setCreateModalOpen(true)}
-            className="btn btn-primary"
-          >
-            <Plus size={13} />
-            New Project
-          </button>
+          {projects.length > 0 && (
+            <button
+              onClick={() => setCreateModalOpen(true)}
+              className="btn btn-secondary"
+            >
+              <Plus size={13} />
+              New Project
+            </button>
+          )}
         </div>
 
         {/* Loading skeletons */}
         {isLoading && (
-          <div style={table}>
+          <div className="w-full border border-[var(--border-subtle)] rounded-[var(--radius-lg)] overflow-hidden">
             {[1, 2, 3].map(i => (
-              <div key={i} style={{
-                height: "48px", borderBottom: i < 3 ? "1px solid var(--border-subtle)" : "none",
-                background: "var(--bg-surface)", animation: "pulse 1.5s ease-in-out infinite",
-                opacity: 1 - i * 0.15,
-              }} />
+              <div key={i} className={`h-12 bg-[var(--bg-surface)] animate-[pulse_1.5s_ease-in-out_infinite] ${i < 3 ? 'border-b border-[var(--border-subtle)]' : ''}`} style={{ opacity: 1 - i * 0.15 }} />
             ))}
           </div>
         )}
 
         {/* Table */}
         {!isLoading && filtered.length > 0 && (
-          <div style={table}>
+          <div className="w-full border border-[var(--border-subtle)] rounded-[var(--radius-lg)] overflow-hidden">
             {/* Header row */}
-            <div style={thead}>
-              <span style={th}>Name</span>
-              <span style={{ ...th, textAlign: "right" }}>Sources</span>
-              <span style={{ ...th, textAlign: "right" }}>Updated</span>
-              <span style={th} />
+            <div className="grid grid-cols-[1fr_100px_90px_36px] px-4 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+              <span className="py-2 text-[0.68rem] font-semibold tracking-[0.06em] uppercase text-[var(--text-subtle)]">Name</span>
+              <span className="py-2 text-[0.68rem] font-semibold tracking-[0.06em] uppercase text-[var(--text-subtle)] text-right">Sources</span>
+              <span className="py-2 text-[0.68rem] font-semibold tracking-[0.06em] uppercase text-[var(--text-subtle)] text-right">Updated</span>
+              <span className="py-2 text-[0.68rem] font-semibold tracking-[0.06em] uppercase text-[var(--text-subtle)]" />
             </div>
 
             {/* Data rows */}
@@ -129,29 +86,17 @@ export function ProjectGrid({ searchQuery = "" }: ProjectGridProps) {
                 <div
                   key={nb.id}
                   onClick={() => open(nb)}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 100px 90px 36px",
-                    padding: "0 16px",
-                    borderBottom: isLast ? "none" : "1px solid var(--border-subtle)",
-                    background: "var(--bg-surface)",
-                    cursor: "pointer",
-                    transition: "background var(--transition-fast)",
-                    alignItems: "center",
-                    minHeight: "48px",
-                  }}
-                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = "var(--bg-surface-hover)"}
-                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = "var(--bg-surface)"}
+                  className={`grid grid-cols-[1fr_100px_90px_36px] items-center px-4 min-h-[48px] bg-[var(--bg-surface)] hover:bg-[var(--bg-surface-hover)] cursor-pointer transition-colors ${!isLast ? 'border-b border-[var(--border-subtle)]' : ''}`}
                 >
                   {/* Name + description */}
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px", overflow: "hidden", paddingRight: "12px" }}>
-                    <BookOpen size={14} style={{ color: "var(--text-subtle)", flexShrink: 0 }} />
-                    <div style={{ overflow: "hidden" }}>
-                      <div style={{ fontSize: "0.8125rem", fontWeight: "500", color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <div className="flex items-center gap-[10px] pr-3 overflow-hidden">
+                    <BookOpen size={14} className="text-[var(--text-subtle)] shrink-0" />
+                    <div className="overflow-hidden">
+                      <div className="text-[0.8125rem] font-medium text-[var(--text-primary)] truncate">
                         {nb.title}
                       </div>
                       {nb.description && (
-                        <div style={{ fontSize: "0.7rem", color: "var(--text-subtle)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <div className="text-[0.7rem] text-[var(--text-subtle)] truncate">
                           {nb.description}
                         </div>
                       )}
@@ -159,28 +104,22 @@ export function ProjectGrid({ searchQuery = "" }: ProjectGridProps) {
                   </div>
 
                   {/* Sources */}
-                  <div style={{ textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "5px" }}>
-                    <FileText size={11} style={{ color: "var(--text-subtle)" }} />
-                    <span style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>{docCount}</span>
+                  <div className="flex items-center justify-end gap-[5px] text-right">
+                    <FileText size={11} className="text-[var(--text-subtle)]" />
+                    <span className="text-[0.78rem] text-[var(--text-muted)]">{docCount}</span>
                   </div>
 
                   {/* Updated */}
-                  <div style={{ textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "5px" }}>
-                    <Clock size={11} style={{ color: "var(--text-subtle)" }} />
-                    <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>{formatRelativeTime(nb.updatedAt)}</span>
+                  <div className="flex items-center justify-end gap-[5px] text-right">
+                    <Clock size={11} className="text-[var(--text-subtle)]" />
+                    <span className="text-[0.72rem] text-[var(--text-muted)]">{formatRelativeTime(nb.updatedAt)}</span>
                   </div>
 
                   {/* Delete */}
-                  <div style={{ display: "flex", justifyContent: "center" }}>
+                  <div className="flex justify-center">
                     <button
                       onClick={e => del(e, nb.id, nb.title)}
-                      style={{
-                        background: "none", border: "none", cursor: "pointer",
-                        color: "var(--text-subtle)", padding: "4px", borderRadius: "var(--radius-sm)",
-                        display: "flex", alignItems: "center", transition: "color var(--transition-fast)",
-                      }}
-                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "var(--status-error-text)"}
-                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "var(--text-subtle)"}
+                      className="flex items-center p-1 rounded-[var(--radius-sm)] bg-transparent border-none cursor-pointer text-[var(--text-subtle)] hover:text-[var(--status-error-text)] transition-colors"
                       title="Delete"
                     >
                       <Trash2 size={13} />
@@ -194,18 +133,12 @@ export function ProjectGrid({ searchQuery = "" }: ProjectGridProps) {
 
         {/* Empty state — compact */}
         {!isLoading && filtered.length === 0 && (
-          <div style={{
-            border: "1px dashed var(--border-medium)",
-            borderRadius: "var(--radius-lg)",
-            padding: "40px 24px",
-            textAlign: "center",
-            background: "var(--bg-surface)",
-          }}>
-            <BookOpen size={22} style={{ color: "var(--text-subtle)", marginBottom: "10px" }} />
-            <p style={{ fontSize: "0.875rem", fontWeight: "500", color: "var(--text-secondary)", marginBottom: "4px" }}>
+          <div className="flex flex-col items-center justify-center mt-[10vh] px-6 py-9 text-center bg-[var(--bg-card)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] shadow-[var(--shadow-sm)]">
+            <BookOpen size={24} className="text-[var(--text-subtle)] mb-3" />
+            <p className="text-base font-semibold text-[var(--text-primary)] mb-1 font-[family-name:var(--font-heading)]">
               {searchQuery ? `No results for "${searchQuery}"` : "No projects yet"}
             </p>
-            <p style={{ fontSize: "0.78rem", color: "var(--text-subtle)", marginBottom: "16px" }}>
+            <p className="text-[0.8125rem] text-[var(--text-muted)] mb-5">
               {searchQuery ? "Try a different search." : "Create a project to start grounding your AI research."}
             </p>
             {!searchQuery && (

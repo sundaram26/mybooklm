@@ -9,14 +9,10 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div style={{
-      display: "flex", flexDirection: "column",
-      height: "100vh", width: "100vw",
-      background: "var(--bg-canvas)", overflow: "hidden",
-    }}>
+    <div className="flex flex-col h-screen w-screen bg-[var(--bg-canvas)] overflow-hidden">
       <AppTopBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
-      <main style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+      <main className="flex-1 overflow-y-auto min-h-0">
         <ProjectGrid searchQuery={searchQuery} />
       </main>
 

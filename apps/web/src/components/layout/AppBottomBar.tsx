@@ -19,44 +19,31 @@ export function AppBottomBar() {
   const isGuest = !user || (user as any).isAnonymous;
 
   return (
-    <footer style={{
-      borderTop: "1px solid var(--border-subtle)",
-      background: "var(--bg-canvas)",
-      display: "flex", alignItems: "center",
-      justifyContent: "space-between",
-      padding: "0 24px",
-      height: "44px",
-      flexShrink: 0,
-    }}>
+    <footer className="flex items-center justify-between px-6 h-[44px] shrink-0 border-t border-[var(--border-subtle)] bg-[var(--bg-canvas)]">
       {/* Left: App identity */}
-      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          <BookOpen size={13} style={{ color: "var(--text-subtle)" }} />
-          <span style={{ fontSize: "0.72rem", color: "var(--text-subtle)", fontWeight: "500" }}>
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-[6px]">
+          <BookOpen size={13} className="text-[var(--text-subtle)]" />
+          <span className="text-[0.72rem] text-[var(--text-subtle)] font-medium">
             noetalm
           </span>
-          <span style={{
-            fontSize: "0.62rem", padding: "1px 5px",
-            borderRadius: "3px",
-            background: "var(--bg-surface)", border: "1px solid var(--border-subtle)",
-            color: "var(--text-subtle)", fontWeight: "500",
-          }}>
+          <span className="text-[0.62rem] py-[1px] px-[5px] rounded-[3px] bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-subtle)] font-medium">
             v1.6.25
           </span>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-          <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#34D399" }} />
-          <span style={{ fontSize: "0.72rem", color: "var(--text-subtle)" }}>
+        <div className="flex items-center gap-1">
+          <div className="w-[5px] h-[5px] rounded-full bg-[#34D399]" />
+          <span className="text-[0.72rem] text-[var(--text-subtle)]">
             {projects.length} project{projects.length !== 1 ? "s" : ""}
           </span>
         </div>
 
         {isGuest && (
-          <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-            <ShieldAlert size={11} style={{ color: "var(--accent-orange)" }} />
-            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
-              {guestTurnCount}/20 turns
+          <div className="flex items-center gap-[5px]">
+            <ShieldAlert size={11} className="text-[var(--text-muted)]" />
+            <span className="text-[0.75rem] text-[var(--text-muted)]">
+              <span className="text-[var(--text-primary)] font-semibold">{guestTurnCount}</span>/20 turns
             </span>
           </div>
         )}
@@ -66,12 +53,12 @@ export function AppBottomBar() {
       <div />
 
       {/* Right: Status */}
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-          <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#34D399" }} />
-          <span style={{ fontSize: "0.72rem", color: "var(--text-subtle)" }}>Online</span>
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-[6px]">
+          <div className="w-[6px] h-[6px] rounded-full bg-[var(--status-success-text)] shadow-[0_0_8px_var(--status-success-bg)]" />
+          <span className="text-[0.75rem] font-medium text-[var(--text-secondary)]">Online</span>
         </div>
-        <span style={{ fontSize: "0.72rem", color: "var(--text-subtle)" }}>
+        <span className="text-[0.75rem] text-[var(--text-subtle)]">
           {user?.name || "Guest"} ↑
         </span>
       </div>

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Allow dashboard to be visible to all
   if (request.nextUrl.pathname === '/') {
     return NextResponse.next();

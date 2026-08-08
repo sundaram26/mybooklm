@@ -27,13 +27,10 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   if (!project) return null; // Or handled by error.tsx
 
   return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 50, display: "flex", flexDirection: "column",
-      background: "var(--bg-canvas)", color: "var(--text-primary)",
-    }}>
+    <div className="fixed inset-0 z-50 flex flex-col bg-[var(--bg-canvas)] text-[var(--text-primary)]">
       <ProjectHeader project={project} />
-      <div style={{ display: "flex", flex: 1, padding: "10px", gap: "10px", overflow: "hidden", height: "calc(100vh - 52px)" }}>
-        <div style={{ width: "260px", flexShrink: 0, background: "var(--bg-surface)", borderRadius: "var(--radius-lg)", border: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div className="flex flex-1 p-[10px] gap-[10px] overflow-hidden h-[calc(100vh-52px)]">
+        <div className="w-[260px] shrink-0 bg-[var(--bg-surface)] rounded-[var(--radius-lg)] border border-[var(--border-subtle)] flex flex-col overflow-hidden">
           <ProjectSidebar projectId={id} />
         </div>
         

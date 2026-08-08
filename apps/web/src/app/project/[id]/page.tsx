@@ -28,39 +28,33 @@ export default function ProjectPage() {
 
   return (
     <>
-      <div style={{ flex: 1, background: "var(--bg-surface)", borderRadius: "var(--radius-lg)", border: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div className="flex-1 bg-[var(--bg-surface)] rounded-[var(--radius-lg)] border border-[var(--border-subtle)] flex flex-col overflow-hidden">
         {/* Top tab switcher */}
-        <div style={{ display: "flex", borderBottom: "1px solid var(--border-subtle)", background: "var(--bg-canvas-subtle)", padding: "6px 12px", gap: "8px", alignItems: "center" }}>
+        <div className="flex border-b border-[var(--border-subtle)] bg-[var(--bg-canvas-subtle)] px-3 py-[6px] gap-2 items-center">
           <button 
             onClick={() => setCenterPanelMode("chat")}
-            style={{
-              padding: "6px 12px", fontSize: "0.78rem",
-              fontWeight: centerPanelMode === "chat" ? 600 : 500,
-              color: centerPanelMode === "chat" ? "var(--text-primary)" : "var(--text-muted)",
-              background: centerPanelMode === "chat" ? "var(--bg-surface)" : "transparent",
-              border: "1px solid " + (centerPanelMode === "chat" ? "var(--border-subtle)" : "transparent"),
-              borderRadius: "var(--radius-md)", cursor: "pointer"
-            }}
+            className={`px-3 py-[6px] text-[0.78rem] rounded-[var(--radius-md)] cursor-pointer transition-colors ${
+              centerPanelMode === "chat" 
+                ? "font-semibold text-[var(--text-primary)] bg-[var(--bg-surface)] border border-[var(--border-subtle)]" 
+                : "font-medium text-[var(--text-muted)] bg-transparent border border-transparent hover:text-[var(--text-primary)]"
+            }`}
           >
             Chat
           </button>
           {hasStudioFeature && (
             <button 
               onClick={() => setCenterPanelMode("studio")}
-              style={{
-                padding: "6px 12px", fontSize: "0.78rem",
-                fontWeight: centerPanelMode === "studio" ? 600 : 500,
-                color: centerPanelMode === "studio" ? "var(--text-primary)" : "var(--text-muted)",
-                background: centerPanelMode === "studio" ? "var(--bg-surface)" : "transparent",
-                border: "1px solid " + (centerPanelMode === "studio" ? "var(--border-subtle)" : "transparent"),
-                borderRadius: "var(--radius-md)", cursor: "pointer"
-              }}
+              className={`px-3 py-[6px] text-[0.78rem] rounded-[var(--radius-md)] cursor-pointer transition-colors ${
+                centerPanelMode === "studio" 
+                  ? "font-semibold text-[var(--text-primary)] bg-[var(--bg-surface)] border border-[var(--border-subtle)]" 
+                  : "font-medium text-[var(--text-muted)] bg-transparent border border-transparent hover:text-[var(--text-primary)]"
+              }`}
             >
               {activeStudioDoc.title}
             </button>
           )}
           {centerPanelMode === "add-source" && (
-            <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--text-primary)" }}>
+            <span className="text-[0.78rem] font-semibold text-[var(--text-primary)]">
               Add Source
             </span>
           )}
@@ -75,7 +69,7 @@ export default function ProjectPage() {
         )}
       </div>
 
-      <div style={{ width: "260px", flexShrink: 0, background: "var(--bg-surface)", borderRadius: "var(--radius-lg)", border: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div className="w-[260px] shrink-0 bg-[var(--bg-surface)] rounded-[var(--radius-lg)] border border-[var(--border-subtle)] flex flex-col overflow-hidden">
         {(selectedDocumentId && !hasStudioFeature) ? <SourceViewer documentId={selectedDocumentId} projectId={projectId} /> : <StudioPanel projectId={projectId} />}
       </div>
       

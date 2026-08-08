@@ -42,16 +42,16 @@ export function SourceList({ projectId }: { projectId: string }) {
   }, [projectId, documents, onRefresh]);
 
   const getIcon = (type: string) => {
-    if (type === "IMAGE") return <ImageIcon size={18} style={{ color: "var(--status-warning-text)" }} />;
-    if (type === "URL") return <Link size={18} style={{ color: "var(--accent-blue)" }} />;
-    return <FileText size={18} style={{ color: "var(--status-info-text)" }} />;
+    if (type === "IMAGE") return <ImageIcon size={18} className="text-[var(--status-warning-text)]" />;
+    if (type === "URL") return <Link size={18} className="text-[var(--accent-blue)]" />;
+    return <FileText size={18} className="text-[var(--status-info-text)]" />;
   };
 
   const getStatusBadge = (doc: DocumentItem) => {
     const { status, progressMessage } = doc;
     if (status === "COMPLETED") {
       return (
-        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2px 8px", borderRadius: "999px", backgroundColor: "var(--status-success-bg)", color: "var(--status-success-text)", fontSize: "0.72rem", fontWeight: "600" }}>
+        <span className="inline-flex items-center gap-1 px-2 py-[2px] rounded-full bg-[var(--status-success-bg)] text-[var(--status-success-text)] text-[0.72rem] font-semibold">
           <CheckCircle2 size={12} />
           Ready
         </span>
@@ -59,14 +59,14 @@ export function SourceList({ projectId }: { projectId: string }) {
     }
     if (status === "PROCESSING" || status === "PENDING") {
       return (
-        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2px 8px", borderRadius: "999px", backgroundColor: "var(--status-warning-bg)", color: "var(--status-warning-text)", fontSize: "0.72rem", fontWeight: "600" }} title={progressMessage || "Processing..."}>
+        <span className="inline-flex items-center gap-1 px-2 py-[2px] rounded-full bg-[var(--status-warning-bg)] text-[var(--status-warning-text)] text-[0.72rem] font-semibold" title={progressMessage || "Processing..."}>
           <RefreshCw size={12} className="spin" />
           {progressMessage ? progressMessage.slice(0, 30) + (progressMessage.length > 30 ? '...' : '') : "Processing"}
         </span>
       );
     }
     return (
-      <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2px 8px", borderRadius: "999px", backgroundColor: "var(--status-error-bg)", color: "var(--status-error-text)", fontSize: "0.72rem", fontWeight: "600" }}>
+      <span className="inline-flex items-center gap-1 px-2 py-[2px] rounded-full bg-[var(--status-error-bg)] text-[var(--status-error-text)] text-[0.72rem] font-semibold">
         <AlertCircle size={12} />
         Failed
       </span>
@@ -74,9 +74,9 @@ export function SourceList({ projectId }: { projectId: string }) {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+    <div className="flex flex-col gap-3">
       {documents.length > 0 && (
-        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "4px" }}>
+        <div className="flex justify-end mb-1">
           <button 
             onClick={async () => {
               if (confirm(`Are you sure you want to delete ALL ${documents.length} sources?`)) {
@@ -86,8 +86,7 @@ export function SourceList({ projectId }: { projectId: string }) {
                 onRefresh();
               }
             }}
-            className="btn btn-ghost" 
-            style={{ fontSize: "0.82rem", color: "var(--status-error-text)", padding: "6px 12px", border: "1px solid var(--status-error-bg)", borderRadius: "var(--radius-md)", backgroundColor: "var(--status-error-bg)", display: "flex", alignItems: "center", gap: "6px" }}
+            className="btn btn-ghost text-[0.82rem] text-[var(--status-error-text)] px-3 py-[6px] border border-[var(--status-error-bg)] rounded-[var(--radius-md)] bg-[var(--status-error-bg)] flex items-center gap-[6px]"
           >
             <Trash2 size={14} />
             Delete All Sources
@@ -98,55 +97,35 @@ export function SourceList({ projectId }: { projectId: string }) {
         documents.map((doc) => (
           <div
             key={doc.id}
-            style={{
-              backgroundColor: "var(--bg-surface)",
-              border: "1px solid var(--border-subtle)",
-              borderRadius: "var(--radius-lg)",
-              padding: "16px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              boxShadow: "var(--shadow-sm)",
-              transition: "all var(--transition-fast)"
-            }}
+            className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4 flex items-center justify-between shadow-[var(--shadow-sm)] transition-all hover:border-[var(--accent-orange)]"
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "14px", overflow: "hidden" }}>
-              <div style={{
-                width: "36px",
-                height: "36px",
-                borderRadius: "var(--radius-md)",
-                backgroundColor: "var(--bg-canvas-subtle)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0
-              }}>
+            <div className="flex items-center gap-[14px] overflow-hidden">
+              <div className="w-9 h-9 rounded-[var(--radius-md)] bg-[var(--bg-canvas-subtle)] flex items-center justify-center shrink-0">
                 {getIcon(doc.type)}
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "0.92rem", fontWeight: "600", color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <div className="flex flex-col overflow-hidden">
+                <div className="flex items-center gap-2">
+                  <span className="text-[0.92rem] font-semibold text-[var(--text-primary)] whitespace-nowrap overflow-hidden text-ellipsis">
                     {doc.title}
                   </span>
                   {getStatusBadge(doc)}
                 </div>
 
-                <span style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginTop: "2px" }}>
-                  {doc.relativePath && <span style={{ fontWeight: 500, color: "var(--text-secondary)" }}>{doc.relativePath} • </span>}
+                <span className="text-[0.78rem] text-[var(--text-muted)] mt-[2px]">
+                  {doc.relativePath && <span className="font-medium text-[var(--text-secondary)]">{doc.relativePath} • </span>}
                   {doc.type} • {doc.fileSize ? `${(doc.fileSize / 1024).toFixed(1)} KB` : "Text note"} • {new Date(doc.createdAt).toLocaleDateString()}
                 </span>
               </div>
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div className="flex items-center gap-2">
               {doc.status === "COMPLETED" && (
                 <a
                   href={api.getDocumentFileProxyUrl(projectId, doc.id)}
                   target="_blank"
                   rel="noreferrer"
-                  className="btn btn-ghost"
-                  style={{ padding: "6px 10px", fontSize: "0.8rem" }}
+                  className="btn btn-ghost px-[10px] py-[6px] text-[0.8rem]"
                   title="Preview / Download Source"
                 >
                   <ExternalLink size={15} />
@@ -160,8 +139,7 @@ export function SourceList({ projectId }: { projectId: string }) {
                     handleDeleteDocument(doc.id);
                   }
                 }}
-                className="btn btn-ghost"
-                style={{ padding: "6px", color: "var(--text-muted)" }}
+                className="btn btn-ghost p-[6px] text-[var(--text-muted)] hover:text-[var(--status-error-text)]"
                 title="Delete Source"
               >
                 <Trash2 size={15} />
@@ -170,15 +148,7 @@ export function SourceList({ projectId }: { projectId: string }) {
           </div>
         ))
       ) : (
-        <div style={{
-          padding: "36px",
-          textAlign: "center",
-          backgroundColor: "var(--bg-surface)",
-          border: "1px dashed var(--border-subtle)",
-          borderRadius: "var(--radius-lg)",
-          color: "var(--text-muted)",
-          fontSize: "0.88rem"
-        }}>
+        <div className="p-9 text-center bg-[var(--bg-surface)] border border-dashed border-[var(--border-subtle)] rounded-[var(--radius-lg)] text-[var(--text-muted)] text-[0.88rem]">
           No sources added yet. Click "Add Source" to upload files, links, or notes.
         </div>
       )}

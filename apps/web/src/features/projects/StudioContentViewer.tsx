@@ -26,11 +26,11 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
 
   if (isFallback || !data) {
     return (
-      <div style={{ padding: "24px", overflowY: "auto", height: "100%", color: "var(--text-secondary)" }}>
-        <h3 style={{ fontSize: "1.2rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "16px" }}>
+      <div className="p-6 overflow-y-auto h-full text-[var(--text-secondary)]">
+        <h3 className="text-[1.2rem] font-semibold text-[var(--text-primary)] mb-4">
           {doc.title}
         </h3>
-        <div style={{ whiteSpace: "pre-wrap", fontFamily: "var(--font-sans)", lineHeight: "1.6" }}>
+        <div className="whitespace-pre-wrap font-[family-name:var(--font-sans)] leading-[1.6]">
           {doc.content}
         </div>
       </div>
@@ -44,25 +44,25 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
     }, 0);
 
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-subtle)", paddingBottom: "12px" }}>
+      <div className="flex flex-col gap-5">
+        <div className="flex justify-between items-center border-b border-[var(--border-subtle)] pb-3">
           <div>
-            <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)" }}>{data.title}</h3>
-            <p style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>Test your understanding of the source materials</p>
+            <h3 className="text-[1.1rem] font-bold text-[var(--text-primary)]">{data.title}</h3>
+            <p className="text-[0.78rem] text-[var(--text-muted)]">Test your understanding of the source materials</p>
           </div>
           {showQuizResults && (
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", background: "var(--bg-canvas)", border: "1px solid var(--border-subtle)", padding: "6px 12px", borderRadius: "var(--radius-md)" }}>
-              <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)" }}>
+            <div className="flex items-center gap-2 bg-[var(--bg-canvas)] border border-[var(--border-subtle)] px-3 py-[6px] rounded-[var(--radius-md)]">
+              <span className="text-[0.85rem] font-semibold text-[var(--text-primary)]">
                 Score: {score} / {questions.length}
               </span>
-              <span style={{ fontSize: "0.72rem", color: score / questions.length >= 0.7 ? "var(--status-success-text)" : "var(--status-warning-text)" }}>
+              <span className={`text-[0.72rem] ${score / questions.length >= 0.7 ? 'text-[var(--status-success-text)]' : 'text-[var(--status-warning-text)]'}`}>
                 ({Math.round((score / questions.length) * 100)}%)
               </span>
             </div>
           )}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+        <div className="flex flex-col gap-6">
           {questions.map((q: any, idx: number) => {
             const selected = quizAnswers[q.id];
             const isCorrect = selected === q.correctAnswer;
@@ -70,85 +70,58 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
             return (
               <div 
                 key={q.id} 
-                style={{ 
-                  background: "var(--bg-canvas)", 
-                  border: "1px solid " + (showQuizResults ? (isCorrect ? "var(--status-success-text)" : "var(--status-error-text)") : "var(--border-subtle)"),
-                  borderRadius: "var(--radius-lg)", 
-                  padding: "16px",
-                  boxShadow: "var(--shadow-sm)"
-                }}
+                className={`bg-[var(--bg-canvas)] rounded-[var(--radius-lg)] p-4 shadow-[var(--shadow-sm)] border ${showQuizResults ? (isCorrect ? "border-[var(--status-success-text)]" : "border-[var(--status-error-text)]") : "border-[var(--border-subtle)]"}`}
               >
-                <div style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                  <span style={{ 
-                    width: "20px", height: "20px", borderRadius: "50%", 
-                    background: "var(--bg-surface)", border: "1px solid var(--border-subtle)",
-                    display: "flex", alignItems: "center", justifyItems: "center", justifyContent: "center",
-                    fontSize: "0.7rem", fontWeight: 700, color: "var(--text-muted)", flexShrink: 0
-                  }}>
+                <div className="flex items-start gap-[10px]">
+                  <span className="w-5 h-5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] flex items-center justify-center text-[0.7rem] font-bold text-[var(--text-muted)] shrink-0">
                     {idx + 1}
                   </span>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: "0.88rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: "12px", lineHeight: 1.4 }}>
+                  <div className="flex-1">
+                    <p className="text-[0.88rem] font-semibold text-[var(--text-primary)] mb-3 leading-[1.4]">
                       {q.question}
                     </p>
 
                     {q.type === "short-answer" ? (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                      <div className="flex flex-col gap-2">
                         <input 
                           type="text" 
                           placeholder="Type your answer here..."
                           value={selected || ""}
                           onChange={(e) => !showQuizResults && setQuizAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
                           disabled={showQuizResults}
-                          style={{
-                            width: "100%", padding: "8px 12px", fontSize: "0.82rem",
-                            background: "var(--bg-surface)", border: "1px solid var(--border-subtle)",
-                            borderRadius: "var(--radius-md)", color: "var(--text-primary)", outline: "none"
-                          }}
+                          className="w-full px-3 py-2 text-[0.82rem] bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-primary)] outline-none"
                         />
                         {showQuizResults && (
-                          <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "4px" }}>
+                          <div className="text-[0.8rem] text-[var(--text-muted)] mt-1">
                             <strong>Suggested Answer:</strong> {q.correctAnswer}
                           </div>
                         )}
                       </div>
                     ) : (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                      <div className="flex flex-col gap-2">
                         {q.options?.map((opt: string) => {
                           const optionCode = opt.match(/^([A-D])\)/)?.[1] || opt;
                           const isOptionSelected = selected === optionCode || selected === opt;
                           const isOptionCorrect = q.correctAnswer === optionCode || q.correctAnswer === opt;
                           
-                          let optBg = "var(--bg-surface)";
-                          let optBorder = "var(--border-subtle)";
+                          let optBg = "bg-[var(--bg-surface)]";
+                          let optBorder = "border-[var(--border-subtle)]";
                           if (isOptionSelected) {
-                            optBg = showQuizResults ? (isCorrect ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)") : "var(--bg-surface-hover)";
-                            optBorder = showQuizResults ? (isCorrect ? "var(--status-success-text)" : "var(--status-error-text)") : "var(--accent-orange)";
+                            optBg = showQuizResults ? (isCorrect ? "bg-[rgba(16,185,129,0.1)]" : "bg-[rgba(239,68,68,0.1)]") : "bg-[var(--bg-surface-hover)]";
+                            optBorder = showQuizResults ? (isCorrect ? "border-[var(--status-success-text)]" : "border-[var(--status-error-text)]") : "border-[var(--accent-orange)]";
                           } else if (showQuizResults && isOptionCorrect) {
-                            optBg = "rgba(16, 185, 129, 0.1)";
-                            optBorder = "var(--status-success-text)";
+                            optBg = "bg-[rgba(16,185,129,0.1)]";
+                            optBorder = "border-[var(--status-success-text)]";
                           }
 
                           return (
                             <div 
                               key={opt}
                               onClick={() => !showQuizResults && setQuizAnswers(prev => ({ ...prev, [q.id]: optionCode }))}
-                              style={{
-                                display: "flex", alignItems: "center", gap: "8px",
-                                padding: "10px 12px", borderRadius: "var(--radius-md)",
-                                background: optBg, border: `1px solid ${optBorder}`,
-                                cursor: showQuizResults ? "default" : "pointer", fontSize: "0.8rem",
-                                color: "var(--text-secondary)", transition: "all var(--transition-fast)"
-                              }}
+                              className={`flex items-center gap-2 px-3 py-[10px] rounded-[var(--radius-md)] border ${optBg} ${optBorder} text-[0.8rem] text-[var(--text-secondary)] transition-all ${showQuizResults ? 'cursor-default' : 'cursor-pointer'}`}
                             >
-                              <div style={{
-                                width: "14px", height: "14px", borderRadius: "50%",
-                                border: `1px solid ${isOptionSelected ? "var(--accent-orange)" : "var(--border-subtle)"}`,
-                                display: "flex", alignItems: "center", justifyContent: "center",
-                                background: isOptionSelected ? "var(--accent-orange)" : "transparent",
-                                flexShrink: 0
-                              }}>
-                                {isOptionSelected && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fff" }} />}
+                              <div className={`w-[14px] h-[14px] rounded-full border flex items-center justify-center shrink-0 ${isOptionSelected ? 'border-[var(--accent-orange)] bg-[var(--accent-orange)]' : 'border-[var(--border-subtle)] bg-transparent'}`}>
+                                {isOptionSelected && <div className="w-[6px] h-[6px] rounded-full bg-white" />}
                               </div>
                               <span>{opt}</span>
                             </div>
@@ -158,12 +131,12 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
                     )}
 
                     {showQuizResults && (
-                      <div style={{ marginTop: "12px", padding: "10px 12px", borderRadius: "var(--radius-md)", background: "var(--bg-surface)", borderLeft: `3px solid ${isCorrect ? "var(--status-success-text)" : "var(--status-error-text)"}` }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.75rem", fontWeight: 700, color: isCorrect ? "var(--status-success-text)" : "var(--status-error-text)", marginBottom: "4px" }}>
+                      <div className={`mt-3 px-3 py-[10px] rounded-[var(--radius-md)] bg-[var(--bg-surface)] border-l-[3px] ${isCorrect ? 'border-l-[var(--status-success-text)]' : 'border-l-[var(--status-error-text)]'}`}>
+                        <div className={`flex items-center gap-[6px] text-[0.75rem] font-bold mb-1 ${isCorrect ? 'text-[var(--status-success-text)]' : 'text-[var(--status-error-text)]'}`}>
                           {isCorrect ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
                           {isCorrect ? "Correct" : "Incorrect"}
                         </div>
-                        <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", lineHeight: 1.4 }}>
+                        <p className="text-[0.75rem] text-[var(--text-muted)] leading-[1.4]">
                           {q.explanation}
                         </p>
                       </div>
@@ -175,12 +148,11 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
           })}
         </div>
 
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "12px", borderTop: "1px solid var(--border-subtle)", paddingTop: "16px" }}>
+        <div className="flex justify-end gap-[10px] mt-3 border-t border-[var(--border-subtle)] pt-4">
           {showQuizResults ? (
             <button 
               onClick={() => { setQuizAnswers({}); setShowQuizResults(false); }}
-              className="btn btn-ghost"
-              style={{ display: "flex", alignItems: "center", gap: "6px", border: "1px solid var(--border-subtle)" }}
+              className="flex items-center gap-[6px] border border-[var(--border-subtle)] bg-transparent text-[var(--text-primary)] px-4 py-2 rounded-[var(--radius-md)] cursor-pointer"
             >
               <RotateCcw size={14} />
               Reset Quiz
@@ -188,9 +160,8 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
           ) : (
             <button 
               onClick={() => setShowQuizResults(true)}
-              className="btn btn-primary"
               disabled={Object.keys(quizAnswers).length < questions.length}
-              style={{ background: "var(--accent-orange)", border: "none", color: "#fff", display: "flex", alignItems: "center", gap: "6px" }}
+              className="flex items-center gap-[6px] bg-[var(--accent-orange)] border-none text-white px-4 py-2 rounded-[var(--radius-md)] cursor-pointer disabled:opacity-50"
             >
               <CheckCircle2 size={14} />
               Submit Answers
@@ -205,72 +176,35 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
     const cards = data.cards || [];
 
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div className="flex flex-col gap-5">
         <div>
-          <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)" }}>{data.title}</h3>
-          <p style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>Flip cards to review key concepts</p>
+          <h3 className="text-[1.1rem] font-bold text-[var(--text-primary)]">{data.title}</h3>
+          <p className="text-[0.78rem] text-[var(--text-muted)]">Flip cards to review key concepts</p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "16px" }}>
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
           {cards.map((card: any, idx: number) => {
             const isFlipped = flippedCards[idx];
             return (
               <div 
                 key={idx}
                 onClick={() => setFlippedCards(prev => ({ ...prev, [idx]: !isFlipped }))}
-                style={{
-                  height: "160px",
-                  perspective: "1000px",
-                  cursor: "pointer"
-                }}
+                className="h-[160px] cursor-pointer"
+                style={{ perspective: "1000px" }}
               >
-                <div style={{
-                  position: "relative",
-                  width: "100%",
-                  height: "100%",
-                  textAlign: "center",
-                  transition: "transform 0.6s",
-                  transformStyle: "preserve-3d",
-                  transform: isFlipped ? "rotateY(180deg)" : "none",
-                  borderRadius: "var(--radius-lg)",
-                  border: "1px solid var(--border-subtle)",
-                  boxShadow: "var(--shadow-sm)",
-                  background: isFlipped ? "var(--bg-canvas-subtle)" : "var(--bg-canvas)"
-                }}>
+                <div className={`relative w-full h-full text-center transition-transform duration-600 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] shadow-[var(--shadow-sm)] ${isFlipped ? 'bg-[var(--bg-canvas-subtle)]' : 'bg-[var(--bg-canvas)]'}`}
+                     style={{ transformStyle: "preserve-3d", transform: isFlipped ? "rotateY(180deg)" : "none" }}>
                   {/* Front */}
-                  <div style={{
-                    position: "absolute",
-                    inset: 0,
-                    backfaceVisibility: "hidden",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    padding: "16px",
-                    color: "var(--text-primary)",
-                    fontWeight: 600,
-                    fontSize: "0.86rem"
-                  }}>
-                    <span style={{ fontSize: "0.62rem", textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.05em", marginBottom: "8px" }}>Concept</span>
+                  <div className="absolute inset-0 flex flex-col justify-center items-center p-4 text-[var(--text-primary)] font-semibold text-[0.86rem]"
+                       style={{ backfaceVisibility: "hidden" }}>
+                    <span className="text-[0.62rem] uppercase text-[var(--text-muted)] tracking-[0.05em] mb-2">Concept</span>
                     {card.front}
                   </div>
 
                   {/* Back */}
-                  <div style={{
-                    position: "absolute",
-                    inset: 0,
-                    backfaceVisibility: "hidden",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    padding: "16px",
-                    color: "var(--text-secondary)",
-                    transform: "rotateY(180deg)",
-                    fontSize: "0.78rem",
-                    lineHeight: 1.4
-                  }}>
-                    <span style={{ fontSize: "0.62rem", textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.05em", marginBottom: "8px" }}>Definition</span>
+                  <div className="absolute inset-0 flex flex-col justify-center items-center p-4 text-[var(--text-secondary)] text-[0.78rem] leading-[1.4]"
+                       style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}>
+                    <span className="text-[0.62rem] uppercase text-[var(--text-muted)] tracking-[0.05em] mb-2">Definition</span>
                     {card.back}
                   </div>
                 </div>
@@ -289,53 +223,42 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
     if (!activeSlide) return <p>No slides found.</p>;
 
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px", height: "100%" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div className="flex flex-col gap-5 h-full">
+        <div className="flex justify-between items-center">
           <div>
-            <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)" }}>{data.title}</h3>
-            <p style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>Interactive slide presentation outline</p>
+            <h3 className="text-[1.1rem] font-bold text-[var(--text-primary)]">{data.title}</h3>
+            <p className="text-[0.78rem] text-[var(--text-muted)]">Interactive slide presentation outline</p>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div className="flex items-center gap-2">
             <button 
               disabled={currentSlide === 0} 
               onClick={() => setCurrentSlide(prev => prev - 1)}
-              style={{ padding: "4px 8px", background: "none", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", cursor: currentSlide === 0 ? "not-allowed" : "pointer" }}
+              className="px-2 py-1 bg-transparent border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-primary)] cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
             >
               <ArrowLeft size={14} />
             </button>
-            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+            <span className="text-[0.75rem] text-[var(--text-muted)]">
               {currentSlide + 1} / {slides.length}
             </span>
             <button 
               disabled={currentSlide === slides.length - 1} 
               onClick={() => setCurrentSlide(prev => prev + 1)}
-              style={{ padding: "4px 8px", background: "none", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-md)", color: "var(--text-primary)", cursor: currentSlide === slides.length - 1 ? "not-allowed" : "pointer" }}
+              className="px-2 py-1 bg-transparent border border-[var(--border-subtle)] rounded-[var(--radius-md)] text-[var(--text-primary)] cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
             >
               <ArrowRight size={14} />
             </button>
           </div>
         </div>
 
-        <div style={{
-          flex: 1,
-          background: "var(--bg-canvas)",
-          border: "1px solid var(--border-subtle)",
-          borderRadius: "var(--radius-lg)",
-          padding: "36px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          boxShadow: "var(--shadow-sm)",
-          minHeight: "260px"
-        }}>
+        <div className="flex-1 bg-[var(--bg-canvas)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-9 flex flex-col justify-between shadow-[var(--shadow-sm)] min-h-[260px]">
           <div>
-            <div style={{ fontSize: "0.7rem", color: "var(--accent-orange)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "8px" }}>
+            <div className="text-[0.7rem] text-[var(--accent-orange)] font-semibold uppercase tracking-[0.05em] mb-2">
               Slide {activeSlide.slideNumber}
             </div>
-            <h2 style={{ fontSize: "1.4rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: "20px" }}>
+            <h2 className="text-[1.4rem] font-bold text-[var(--text-primary)] mb-5">
               {activeSlide.title}
             </h2>
-            <ul style={{ display: "flex", flexDirection: "column", gap: "10px", paddingLeft: "20px", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.5 }}>
+            <ul className="flex flex-col gap-[10px] pl-5 text-[var(--text-secondary)] text-[0.9rem] leading-[1.5] list-disc">
               {activeSlide.bulletPoints?.map((pt: string, i: number) => (
                 <li key={i}>{pt}</li>
               ))}
@@ -343,9 +266,9 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
           </div>
 
           {activeSlide.notes && (
-            <div style={{ borderTop: "1px solid var(--border-subtle)", marginTop: "24px", paddingTop: "12px" }}>
-              <div style={{ fontSize: "0.68rem", fontWeight: 600, color: "var(--text-subtle)", textTransform: "uppercase", marginBottom: "4px" }}>Speaker Notes</div>
-              <p style={{ fontSize: "0.76rem", color: "var(--text-muted)", fontStyle: "italic", lineHeight: 1.4 }}>
+            <div className="border-t border-[var(--border-subtle)] mt-6 pt-3">
+              <div className="text-[0.68rem] font-semibold text-[var(--text-subtle)] uppercase mb-1">Speaker Notes</div>
+              <p className="text-[0.76rem] text-[var(--text-muted)] italic leading-[1.4]">
                 {activeSlide.notes}
               </p>
             </div>
@@ -358,18 +281,18 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
   const renderReports = () => {
     const sections = data.sections || [];
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div className="flex flex-col gap-5">
         <div>
-          <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)" }}>{data.title}</h3>
-          <p style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>Briefing Report</p>
+          <h3 className="text-[1.1rem] font-bold text-[var(--text-primary)]">{data.title}</h3>
+          <p className="text-[0.78rem] text-[var(--text-muted)]">Briefing Report</p>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <div className="flex flex-col gap-4">
           {sections.map((sec: any, i: number) => (
-            <div key={i} style={{ background: "var(--bg-canvas)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", padding: "16px" }}>
-              <h4 style={{ fontSize: "0.94rem", fontWeight: 700, color: "var(--text-primary)", borderBottom: "1px solid var(--border-subtle)", paddingBottom: "8px", marginBottom: "10px" }}>
+            <div key={i} className="bg-[var(--bg-canvas)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-4">
+              <h4 className="text-[0.94rem] font-bold text-[var(--text-primary)] border-b border-[var(--border-subtle)] pb-2 mb-[10px]">
                 {sec.heading}
               </h4>
-              <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)", lineHeight: 1.5, whiteSpace: "pre-wrap" }}>
+              <p className="text-[0.82rem] text-[var(--text-secondary)] leading-[1.5] whitespace-pre-wrap">
                 {sec.content}
               </p>
             </div>
@@ -382,43 +305,24 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
   const renderAudioOverview = () => {
     const transcript = data.transcript || [];
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div className="flex flex-col gap-5">
         <div>
-          <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)" }}>{data.title}</h3>
-          <p style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>Overview Script featuring: {data.hosts?.join(", ")}</p>
+          <h3 className="text-[1.1rem] font-bold text-[var(--text-primary)]">{data.title}</h3>
+          <p className="text-[0.78rem] text-[var(--text-muted)]">Overview Script featuring: {data.hosts?.join(", ")}</p>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px", background: "var(--bg-canvas-subtle)", padding: "16px", borderRadius: "var(--radius-lg)" }}>
+        <div className="flex flex-col gap-3 bg-[var(--bg-canvas-subtle)] p-4 rounded-[var(--radius-lg)]">
           {transcript.map((line: any, i: number) => {
             const isHostA = line.speaker?.toLowerCase().includes("a") || i % 2 === 0;
             return (
               <div 
                 key={i} 
-                style={{ 
-                  display: "flex", 
-                  flexDirection: isHostA ? "row" : "row-reverse", 
-                  alignItems: "flex-start", 
-                  gap: "10px" 
-                }}
+                className={`flex items-start gap-[10px] ${isHostA ? 'flex-row' : 'flex-row-reverse'}`}
               >
-                <div style={{
-                  width: "28px", height: "28px", borderRadius: "50%",
-                  background: isHostA ? "var(--accent-orange)" : "var(--accent-blue)",
-                  color: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "0.68rem", fontWeight: 700, flexShrink: 0
-                }}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[0.68rem] font-bold text-white shrink-0 ${isHostA ? 'bg-[var(--accent-orange)]' : 'bg-[var(--accent-blue)]'}`}>
                   {line.speaker?.charAt(0).toUpperCase()}
                 </div>
-                <div style={{
-                  background: "var(--bg-surface)",
-                  border: "1px solid var(--border-subtle)",
-                  borderRadius: "var(--radius-md)",
-                  padding: "10px 14px",
-                  maxWidth: "75%",
-                  fontSize: "0.8rem",
-                  lineHeight: 1.4,
-                  color: "var(--text-secondary)"
-                }}>
-                  <strong style={{ display: "block", fontSize: "0.7rem", color: "var(--text-primary)", marginBottom: "4px" }}>
+                <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-[var(--radius-md)] px-[14px] py-[10px] max-w-[75%] text-[0.8rem] leading-[1.4] text-[var(--text-secondary)]">
+                  <strong className="block text-[0.7rem] text-[var(--text-primary)] mb-1">
                     {line.speaker}
                   </strong>
                   {line.text}
@@ -434,25 +338,25 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
   const renderVideoOverview = () => {
     const scenes = data.scenes || [];
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div className="flex flex-col gap-5">
         <div>
-          <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)" }}>{data.title}</h3>
-          <p style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>Scene Storyboard outline</p>
+          <h3 className="text-[1.1rem] font-bold text-[var(--text-primary)]">{data.title}</h3>
+          <p className="text-[0.78rem] text-[var(--text-muted)]">Scene Storyboard outline</p>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <div className="flex flex-col gap-4">
           {scenes.map((scene: any, i: number) => (
-            <div key={i} style={{ background: "var(--bg-canvas)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-              <div style={{ background: "var(--bg-canvas-subtle)", borderBottom: "1px solid var(--border-subtle)", padding: "8px 16px", fontSize: "0.78rem", fontWeight: 700, color: "var(--text-primary)" }}>
+            <div key={i} className="bg-[var(--bg-canvas)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] flex flex-col overflow-hidden">
+              <div className="bg-[var(--bg-canvas-subtle)] border-b border-[var(--border-subtle)] px-4 py-2 text-[0.78rem] font-bold text-[var(--text-primary)]">
                 Scene {scene.sceneNumber || (i + 1)}
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", padding: "16px" }}>
-                <div style={{ borderRight: "1px solid var(--border-subtle)", paddingRight: "16px" }}>
-                  <div style={{ fontSize: "0.64rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600, marginBottom: "6px" }}>Visual Storyboard</div>
-                  <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.4 }}>{scene.visual}</p>
+              <div className="grid grid-cols-2 gap-4 p-4">
+                <div className="border-r border-[var(--border-subtle)] pr-4">
+                  <div className="text-[0.64rem] text-[var(--text-muted)] uppercase font-semibold mb-[6px]">Visual Storyboard</div>
+                  <p className="text-[0.78rem] text-[var(--text-secondary)] leading-[1.4]">{scene.visual}</p>
                 </div>
                 <div>
-                  <div style={{ fontSize: "0.64rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 600, marginBottom: "6px" }}>Audio/Voiceover</div>
-                  <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.4 }}>{scene.audio}</p>
+                  <div className="text-[0.64rem] text-[var(--text-muted)] uppercase font-semibold mb-[6px]">Audio/Voiceover</div>
+                  <p className="text-[0.78rem] text-[var(--text-secondary)] leading-[1.4]">{scene.audio}</p>
                 </div>
               </div>
             </div>
@@ -468,26 +372,26 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
     const getChildren = (id: string) => nodes.filter((n: any) => n.parentId === id);
 
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div className="flex flex-col gap-5">
         <div>
-          <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)" }}>{data.title}</h3>
-          <p style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>Hierarchical Mind Map Outline</p>
+          <h3 className="text-[1.1rem] font-bold text-[var(--text-primary)]">{data.title}</h3>
+          <p className="text-[0.78rem] text-[var(--text-muted)]">Hierarchical Mind Map Outline</p>
         </div>
-        <div style={{ background: "var(--bg-canvas)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", padding: "24px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <div className="bg-[var(--bg-canvas)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-6 flex flex-col items-center">
           {mainNode && (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px", width: "100%" }}>
-              <div style={{ background: "var(--accent-orange)", color: "#fff", padding: "10px 20px", borderRadius: "var(--radius-md)", fontWeight: 700, fontSize: "0.9rem", boxShadow: "var(--shadow-sm)" }}>
+            <div className="flex flex-col items-center gap-5 w-full">
+              <div className="bg-[var(--accent-orange)] text-white px-5 py-[10px] rounded-[var(--radius-md)] font-bold text-[0.9rem] shadow-[var(--shadow-sm)]">
                 {mainNode.label}
               </div>
-              <div style={{ display: "flex", justifyContent: "space-around", flexWrap: "wrap", gap: "16px", width: "100%" }}>
+              <div className="flex justify-around flex-wrap gap-4 w-full">
                 {getChildren(mainNode.id).map((subNode: any) => (
-                  <div key={subNode.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", border: "1px dashed var(--border-subtle)", padding: "12px", borderRadius: "var(--radius-lg)", minWidth: "160px", background: "var(--bg-surface)" }}>
-                    <div style={{ background: "var(--bg-canvas-subtle)", border: "1px solid var(--border-subtle)", padding: "6px 12px", borderRadius: "var(--radius-md)", fontSize: "0.8rem", fontWeight: 600, color: "var(--text-primary)" }}>
+                  <div key={subNode.id} className="flex flex-col items-center gap-3 border border-dashed border-[var(--border-subtle)] p-3 rounded-[var(--radius-lg)] min-w-[160px] bg-[var(--bg-surface)]">
+                    <div className="bg-[var(--bg-canvas-subtle)] border border-[var(--border-subtle)] px-3 py-[6px] rounded-[var(--radius-md)] text-[0.8rem] font-semibold text-[var(--text-primary)]">
                       {subNode.label}
                     </div>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "6px", width: "100%" }}>
+                    <div className="flex flex-col gap-[6px] w-full">
                       {getChildren(subNode.id).map((childNode: any) => (
-                        <div key={childNode.id} style={{ background: "var(--bg-canvas)", border: "1px solid var(--border-subtle)", padding: "4px 8px", borderRadius: "var(--radius-sm)", fontSize: "0.72rem", color: "var(--text-secondary)", textAlign: "center" }}>
+                        <div key={childNode.id} className="bg-[var(--bg-canvas)] border border-[var(--border-subtle)] px-2 py-1 rounded-[var(--radius-sm)] text-[0.72rem] text-[var(--text-secondary)] text-center">
                           {childNode.label}
                         </div>
                       ))}
@@ -505,22 +409,22 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
   const renderInfographic = () => {
     const sections = data.sections || [];
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div className="flex flex-col gap-5">
         <div>
-          <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)" }}>{data.title}</h3>
-          <p style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>Infographic Layout & Visual Highlights</p>
+          <h3 className="text-[1.1rem] font-bold text-[var(--text-primary)]">{data.title}</h3>
+          <p className="text-[0.78rem] text-[var(--text-muted)]">Infographic Layout & Visual Highlights</p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-4">
           {sections.map((sec: any, i: number) => (
-            <div key={i} style={{ background: "var(--bg-canvas)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", padding: "20px", display: "flex", flexDirection: "column", gap: "10px", boxShadow: "var(--shadow-sm)" }}>
-              <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "rgba(249, 115, 22, 0.1)", color: "var(--accent-orange)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", fontWeight: 700 }}>
+            <div key={i} className="bg-[var(--bg-canvas)] border border-[var(--border-subtle)] rounded-[var(--radius-lg)] p-5 flex flex-col gap-[10px] shadow-[var(--shadow-sm)]">
+              <div className="w-9 h-9 rounded-full bg-[rgba(249,115,22,0.1)] text-[var(--accent-orange)] flex items-center justify-center text-[0.8rem] font-bold">
                 {i + 1}
               </div>
-              <h4 style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--text-primary)" }}>{sec.title}</h4>
-              <div style={{ background: "var(--bg-surface)", padding: "8px 12px", borderRadius: "var(--radius-md)", borderLeft: "3px solid var(--accent-orange)", fontSize: "0.84rem", fontWeight: 700, color: "var(--text-secondary)" }}>
+              <h4 className="text-[0.88rem] font-bold text-[var(--text-primary)]">{sec.title}</h4>
+              <div className="bg-[var(--bg-surface)] px-3 py-2 rounded-[var(--radius-md)] border-l-[3px] border-l-[var(--accent-orange)] text-[0.84rem] font-bold text-[var(--text-secondary)]">
                 {sec.dataPoint}
               </div>
-              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontStyle: "italic", marginTop: "4px" }}>
+              <p className="text-[0.75rem] text-[var(--text-muted)] italic mt-1">
                 <strong>Visual Idea:</strong> {sec.visualIdea}
               </p>
             </div>
@@ -534,17 +438,17 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
     const headers = data.headers || [];
     const rows = data.rows || [];
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div className="flex flex-col gap-5">
         <div>
-          <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)" }}>{data.title}</h3>
-          <p style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>Structured Workspace Data</p>
+          <h3 className="text-[1.1rem] font-bold text-[var(--text-primary)]">{data.title}</h3>
+          <p className="text-[0.78rem] text-[var(--text-muted)]">Structured Workspace Data</p>
         </div>
-        <div style={{ overflowX: "auto", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-lg)", background: "var(--bg-canvas)", boxShadow: "var(--shadow-sm)" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div className="overflow-x-auto border border-[var(--border-subtle)] rounded-[var(--radius-lg)] bg-[var(--bg-canvas)] shadow-[var(--shadow-sm)]">
+          <table className="w-full border-collapse">
             <thead>
-              <tr style={{ background: "var(--bg-canvas-subtle)", borderBottom: "1px solid var(--border-subtle)" }}>
+              <tr className="bg-[var(--bg-canvas-subtle)] border-b border-[var(--border-subtle)]">
                 {headers.map((h: string, idx: number) => (
-                  <th key={idx} style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-primary)", textTransform: "uppercase", letterSpacing: "0.02em" }}>
+                  <th key={idx} className="px-4 py-3 text-left text-[0.75rem] font-bold text-[var(--text-primary)] uppercase tracking-[0.02em]">
                     {h}
                   </th>
                 ))}
@@ -552,9 +456,9 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
             </thead>
             <tbody>
               {rows.map((row: string[], rowIdx: number) => (
-                <tr key={rowIdx} style={{ borderBottom: rowIdx === rows.length - 1 ? "none" : "1px solid var(--border-subtle)" }}>
+                <tr key={rowIdx} className={rowIdx === rows.length - 1 ? "" : "border-b border-[var(--border-subtle)]"}>
                   {row.map((val: string, valIdx: number) => (
-                    <td key={valIdx} style={{ padding: "12px 16px", fontSize: "0.78rem", color: "var(--text-secondary)" }}>
+                    <td key={valIdx} className="px-4 py-3 text-[0.78rem] text-[var(--text-secondary)]">
                       {val}
                     </td>
                   ))}
@@ -589,7 +493,7 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
         return renderDataTable();
       default:
         return (
-          <div style={{ whiteSpace: "pre-wrap", lineHeight: "1.6", fontSize: "0.84rem" }}>
+          <div className="whitespace-pre-wrap leading-[1.6] text-[0.84rem]">
             {JSON.stringify(data, null, 2)}
           </div>
         );
@@ -612,20 +516,20 @@ export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: s
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100%", background: "var(--bg-surface)" }}>
+    <div className="flex flex-col h-full bg-[var(--bg-surface)]">
       {/* Header bar */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "12px 16px", borderBottom: "1px solid var(--border-subtle)", flexShrink: 0 }}>
-        <div style={{ color: "var(--accent-orange)" }}>
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border-subtle)] shrink-0">
+        <div className="text-[var(--accent-orange)]">
           {getFeatureIcon()}
         </div>
-        <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)" }}>
+        <span className="text-[0.85rem] font-bold text-[var(--text-primary)]">
           {data.title || doc.title}
         </span>
       </div>
 
       {/* Main Workspace Scroll Area */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "20px 24px" }}>
-        <div style={{ maxWidth: "760px", margin: "0 auto" }}>
+      <div className="flex-1 overflow-y-auto px-6 py-5">
+        <div className="max-w-[760px] mx-auto">
           {renderContent()}
         </div>
       </div>

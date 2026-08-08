@@ -43,29 +43,28 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" style={{ maxWidth: "440px" }} onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div style={{ padding: "8px", borderRadius: "var(--radius-md)", backgroundColor: "var(--accent-blue-light)", color: "var(--accent-blue)" }}>
+      <div className="modal-content max-w-[440px]" onClick={(e) => e.stopPropagation()}>
+        <div className="flex justify-between items-center mb-5">
+          <div className="flex items-center gap-[10px]">
+            <div className="p-2 rounded-[var(--radius-md)] bg-[var(--accent-blue-light)] text-[var(--accent-blue)]">
               <LogIn size={20} />
             </div>
-            <h3 style={{ fontSize: "1.2rem", fontWeight: "700", color: "var(--text-primary)" }}>Sign In / Guest Access</h3>
+            <h3 className="text-[1.2rem] font-bold text-[var(--text-primary)]">Sign In / Guest Access</h3>
           </div>
-          <button onClick={onClose} className="btn btn-ghost" style={{ padding: "6px" }}>
+          <button onClick={onClose} className="btn btn-ghost p-[6px]">
             <X size={18} />
           </button>
         </div>
 
-        <p style={{ fontSize: "0.88rem", color: "var(--text-muted)", marginBottom: "24px", lineHeight: "1.5" }}>
+        <p className="text-[0.88rem] text-[var(--text-muted)] mb-6 leading-[1.5]">
           Sign in to save your notebooks across devices, or continue as a guest (up to 10 prompts per notebook).
         </p>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <div className="flex flex-col gap-3">
           <button
             onClick={() => handleOAuth("google")}
             disabled={loading}
-            className="btn btn-secondary"
-            style={{ padding: "12px", justifyContent: "center" }}
+            className="btn btn-secondary p-3 justify-center"
           >
             <span>Continue with Google</span>
           </button>
@@ -73,23 +72,21 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
           <button
             onClick={() => handleOAuth("github")}
             disabled={loading}
-            className="btn btn-secondary"
-            style={{ padding: "12px", justifyContent: "center" }}
+            className="btn btn-secondary p-3 justify-center"
           >
             <span>Continue with GitHub</span>
           </button>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "8px 0" }}>
-            <div style={{ flex: 1, height: "1px", backgroundColor: "var(--border-subtle)" }} />
-            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>OR</span>
-            <div style={{ flex: 1, height: "1px", backgroundColor: "var(--border-subtle)" }} />
+          <div className="flex items-center gap-3 my-2">
+            <div className="flex-1 h-[1px] bg-[var(--border-subtle)]" />
+            <span className="text-[0.75rem] text-[var(--text-muted)]">OR</span>
+            <div className="flex-1 h-[1px] bg-[var(--border-subtle)]" />
           </div>
 
           <button
             onClick={handleGuest}
             disabled={loading}
-            className="btn btn-primary"
-            style={{ padding: "12px", justifyContent: "center" }}
+            className="btn btn-primary p-3 justify-center"
           >
             <UserCheck size={18} />
             <span>Continue as Guest</span>
