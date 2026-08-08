@@ -40,6 +40,8 @@
   --accent-orange:       #E8521F;
   --accent-orange-hover: #CF4418;
   --accent-orange-light: rgba(232, 82, 31, 0.12);
+  --accent-blue:         #3B82F6;
+  --accent-blue-light:   rgba(59, 130, 246, 0.12);
   --accent-foreground:   #FFFFFF;
 
   --text-primary:   #ECECEC;
@@ -93,6 +95,8 @@
   --accent-orange:       #D94A18;
   --accent-orange-hover: #C03E12;
   --accent-orange-light: rgba(217, 74, 24, 0.08);
+  --accent-blue:         #2563EB;
+  --accent-blue-light:   rgba(37, 99, 235, 0.08);
   --accent-foreground:   #FFFFFF;
 
   --text-primary:   #111113;
@@ -142,6 +146,11 @@
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* ==========================================================================
@@ -270,4 +279,36 @@
   padding: 24px;
   box-shadow: var(--shadow-lg);
   animation: slideUp 150ms ease-out;
+}
+
+/* ==========================================================================
+   UTILITIES
+   ========================================================================== */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-canvas) 25%,
+    var(--bg-surface-hover) 50%,
+    var(--bg-canvas) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }

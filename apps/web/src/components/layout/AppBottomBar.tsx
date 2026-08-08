@@ -4,7 +4,7 @@ import React from "react";
 import { Home, FileText, Settings, BookOpen, ShieldAlert } from "lucide-react";
 import { useWorkspaceStore } from "../../store/workspaceStore";
 import { useSession } from "../../lib/auth-client";
-import { useNotebooks } from "../../lib/hooks";
+import { useProjects } from "../../lib/hooks";
 
 const TABS = [
   { key: "dashboard", icon: Home,     label: "Overview"    },
@@ -12,9 +12,9 @@ const TABS = [
 ] as const;
 
 export function AppBottomBar() {
-  const { currentView, setCurrentView, setSelectedNotebook, guestTurnCount } = useWorkspaceStore();
+  const { guestTurnCount } = useWorkspaceStore();
   const { data: session } = useSession();
-  const { data: notebooks = [] } = useNotebooks();
+  const { data: projects = [] } = useProjects();
   const user = session?.user;
   const isGuest = !user || (user as any).isAnonymous;
 
@@ -48,7 +48,7 @@ export function AppBottomBar() {
         <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
           <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#34D399" }} />
           <span style={{ fontSize: "0.72rem", color: "var(--text-subtle)" }}>
-            {notebooks.length} notebook{notebooks.length !== 1 ? "s" : ""}
+            {projects.length} project{projects.length !== 1 ? "s" : ""}
           </span>
         </div>
 
@@ -63,41 +63,7 @@ export function AppBottomBar() {
       </div>
 
       {/* Center: Tab navigation */}
-      <nav style={{ display: "flex", alignItems: "center", gap: "2px" }}>
-        {TABS.map(({ key, icon: Icon, label }, i) => {
-          const active = currentView === key;
-          return (
-            <button
-              key={key}
-              onClick={() => { setCurrentView(key); if (key === "dashboard") setSelectedNotebook(null); }}
-              style={{
-                display: "flex", alignItems: "center", gap: "5px",
-                padding: "5px 12px", borderRadius: "var(--radius-md)",
-                border: "none", background: "transparent", cursor: "pointer",
-                color: active ? "var(--text-primary)" : "var(--text-muted)",
-                fontSize: "0.78rem", fontWeight: active ? "600" : "400",
-                transition: "all var(--transition-fast)",
-                position: "relative",
-              }}
-              onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLElement).style.background = "var(--bg-surface)"; (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"; }}}
-              onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--text-muted)"; }}}
-            >
-              <span style={{
-                display: "inline-flex",
-                position: "absolute", top: "-1px", left: "50%", transform: "translateX(-50%)",
-                width: active ? "20px" : "0", height: "2px",
-                background: "var(--accent-orange)", borderRadius: "999px",
-                transition: "width var(--transition-fast)",
-              }} />
-              <span style={{ fontSize: "0.72rem", color: "var(--text-subtle)", fontWeight: "500" }}>
-                0{i + 1}
-              </span>
-              <Icon size={13} />
-              <span>{label}</span>
-            </button>
-          );
-        })}
-      </nav>
+      <div />
 
       {/* Right: Status */}
       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>

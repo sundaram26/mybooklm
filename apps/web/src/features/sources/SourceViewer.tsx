@@ -33,18 +33,13 @@ const YoutubeIcon = ({ size = 16, className = "" }: { size?: number; className?:
   </svg>
 );
 
-export function SourceViewer() {
+export function SourceViewer({ documentId, projectId }: { documentId: string, projectId: string }) {
   const { 
-    selectedNotebook, 
-    selectedDocumentId, 
     setSelectedDocumentId 
   } = useWorkspaceStore();
 
-  const notebookId = selectedNotebook?.id || "";
-  const documentId = selectedDocumentId || "";
-
   const { data: doc, isLoading, error } = useDocument(documentId ? documentId : null);
-  const deleteDocMutation = useDeleteDocument(notebookId);
+  const deleteDocMutation = useDeleteDocument(projectId);
 
   React.useEffect(() => {
     if (error) {
@@ -76,9 +71,9 @@ export function SourceViewer() {
     return (match && match[2] && match[2].length === 11) ? match[2] : null;
   };
 
-  if (!selectedDocumentId) return null;
+  if (!documentId) return null;
 
-  const fileProxyUrl = doc ? api.getDocumentFileProxyUrl(notebookId, doc.id) : "";
+  const fileProxyUrl = doc ? api.getDocumentFileProxyUrl(projectId, doc.id) : "";
   const isYouTube = doc?.type === "URL" && doc.url && getYouTubeId(doc.url);
   const ytVideoId = isYouTube && doc?.url ? getYouTubeId(doc.url) : null;
 

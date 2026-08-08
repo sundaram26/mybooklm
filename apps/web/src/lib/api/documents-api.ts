@@ -1,21 +1,9 @@
 import { axiosClient, API_BASE } from "./axios-client";
+import { DocumentItem } from "@repo/shared";
 
-
-export interface DocumentItem {
-  id: string;
-  notebookId: string;
-  title: string;
-  type: "PDF" | "TXT" | "MD" | "CSV" | "JSON" | "IMAGE" | "URL";
-  status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
-  fileUrl?: string;
-  url?: string;
-  fileSize?: number;
-  relativePath?: string;
-  errorMessage?: string;
-  progress?: number;
-  progressMessage?: string;
-  studioFeature?: string;
-  createdAt: string;
+export interface StudioOptions {
+  customParams?: Record<string, string | boolean | number>;
+  selectedModelId?: string | null;
 }
 
 export const documentsApi = {
@@ -96,7 +84,7 @@ export const documentsApi = {
   async generateStudioOutput(
     notebookId: string,
     feature: string,
-    options?: { customParams?: Record<string, any>; selectedModelId?: string | null }
+    options?: StudioOptions
   ): Promise<DocumentItem> {
     try {
       const response = await axiosClient.post(`/notebooks/${notebookId}/studio`, {

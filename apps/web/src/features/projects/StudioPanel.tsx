@@ -21,23 +21,20 @@ const STUDIO_ITEMS = [
   { label: "Data Table",      slug: "data-table",      Icon: Table,          color: "var(--text-secondary)"      },
 ];
 
-export function StudioPanel() {
+export function StudioPanel({ projectId }: { projectId: string }) {
   const { 
-    selectedNotebook, 
-
     setSelectedDocumentId,
     setCenterPanelMode,
     setCustomizingStudioFeature
   } = useWorkspaceStore();
 
-  const notebookId = selectedNotebook?.id || "";
-  const generateStudioMutation = useGenerateStudio(notebookId);
+  const generateStudioMutation = useGenerateStudio(projectId);
 
   const [generatingSlug, setGeneratingSlug] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleGenerate = async (slug: string) => {
-    if (!notebookId || generatingSlug) return;
+    if (!projectId || generatingSlug) return;
     setGeneratingSlug(slug);
     setErrorMsg(null);
 
@@ -121,7 +118,7 @@ export function StudioPanel() {
             return (
               <button
                 key={label}
-                disabled={isAnyGenerating || !notebookId}
+                disabled={isAnyGenerating || !projectId}
                 onClick={() => setCustomizingStudioFeature(slug)}
                 style={{
                   display: "flex", flexDirection: "column",
@@ -130,14 +127,14 @@ export function StudioPanel() {
                   background: isThisGenerating ? "var(--bg-surface-hover)" : "var(--bg-canvas)",
                   border: isThisGenerating ? "1px solid var(--accent-orange)" : "1px solid var(--border-subtle)",
                   borderRadius: "var(--radius-lg)",
-                  cursor: (isAnyGenerating || !notebookId) ? "not-allowed" : "pointer", 
+                  cursor: (isAnyGenerating || !projectId) ? "not-allowed" : "pointer", 
                   transition: "all var(--transition-fast)",
                   color: isThisGenerating ? "var(--text-primary)" : "var(--text-secondary)",
                   gridColumn: label === "Data Table" ? "span 2" : "span 1",
-                  opacity: (isAnyGenerating && !isThisGenerating) || !notebookId ? 0.5 : 1,
+                  opacity: (isAnyGenerating && !isThisGenerating) || !projectId ? 0.5 : 1,
                 }}
-                onMouseEnter={e => { if (!isAnyGenerating && notebookId) { (e.currentTarget as HTMLElement).style.background = "var(--bg-surface-hover)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--border-medium)"; (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"; } }}
-                onMouseLeave={e => { if (!isAnyGenerating && notebookId) { (e.currentTarget as HTMLElement).style.background = "var(--bg-canvas)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--border-subtle)"; (e.currentTarget as HTMLElement).style.color = "var(--text-secondary)"; } }}
+                onMouseEnter={e => { if (!isAnyGenerating && projectId) { (e.currentTarget as HTMLElement).style.background = "var(--bg-surface-hover)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--border-medium)"; (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"; } }}
+                onMouseLeave={e => { if (!isAnyGenerating && projectId) { (e.currentTarget as HTMLElement).style.background = "var(--bg-canvas)"; (e.currentTarget as HTMLElement).style.borderColor = "var(--border-subtle)"; (e.currentTarget as HTMLElement).style.color = "var(--text-secondary)"; } }}
               >
                 {isThisGenerating ? (
                   <Loader2 size={18} className="animate-spin" style={{ color: "var(--accent-orange)" }} />
@@ -153,7 +150,7 @@ export function StudioPanel() {
         </div>
 
         <p style={{ textAlign: "center", fontSize: "0.68rem", color: "var(--text-subtle)", marginTop: "14px" }}>
-          {!notebookId ? "Select a notebook to use the Studio." : "Studio output will be saved as notes here."}
+          {!projectId ? "Select a project to use the Studio." : "Studio output will be saved as notes here."}
         </p>
       </div>
 

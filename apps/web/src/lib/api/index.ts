@@ -1,11 +1,12 @@
-import { notebooksApi, Notebook } from "./notebooks-api";
-import { documentsApi, DocumentItem } from "./documents-api";
+import { projectsApi } from "./projects-api";
+import { documentsApi } from "./documents-api";
 import { chatApi, ChatMessage } from "./chat-api";
+import { Project, DocumentItem } from "@repo/shared";
 
-export type { Notebook, DocumentItem, ChatMessage };
+export type { Project, DocumentItem, ChatMessage };
 
 export const api = {
-  ...notebooksApi,
+  ...projectsApi,
   ...documentsApi,
   ...chatApi,
   getModels: async () => {

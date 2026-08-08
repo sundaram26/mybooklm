@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Search, Key, Sun, Moon, Monitor, LogIn, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useTheme } from "../theme-provider";
 import { useWorkspaceStore } from "../../store/workspaceStore";
 import { useSession, signOut } from "../../lib/auth-client";
@@ -15,7 +16,8 @@ export function AppTopBar({ searchQuery, onSearchChange }: AppTopBarProps) {
   const { theme, setTheme } = useTheme();
   const { data: session } = useSession();
   const user = session?.user;
-  const { setAuthModalOpen, setViewMode } = useWorkspaceStore();
+  const { setAuthModalOpen } = useWorkspaceStore();
+  const router = useRouter();
 
   const THEMES = [
     { v: "light",  Icon: Sun     },
@@ -34,7 +36,7 @@ export function AppTopBar({ searchQuery, onSearchChange }: AppTopBarProps) {
     }}>
       {/* Left: Logo */}
       <button
-        onClick={() => setViewMode("landing")}
+        onClick={() => { router.push("/"); }}
         style={{
           display: "flex", alignItems: "center", gap: "7px",
           background: "none", border: "none", cursor: "pointer", padding: "0",

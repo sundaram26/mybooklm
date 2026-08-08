@@ -12,7 +12,7 @@ import {
   Loader2
 } from "lucide-react";
 import { useWorkspaceStore } from "../../store/workspaceStore";
-import { useUploadFile, useUploadUrl, useCreateTextNote } from "../../lib/hooks";
+import { useUploadFile, useUploadUrl, useCreateTextNote, useProject } from "../../lib/hooks";
 
 const YoutubeIcon = ({ size = 16, className = "" }: { size?: number; className?: string }) => (
   <svg 
@@ -31,13 +31,13 @@ const YoutubeIcon = ({ size = 16, className = "" }: { size?: number; className?:
   </svg>
 );
 
-export function AddSourceGrid() {
-  const { selectedNotebook, setCenterPanelMode } = useWorkspaceStore();
-  const notebookId = selectedNotebook?.id || "";
+export function AddSourceGrid({ projectId }: { projectId: string }) {
+  const { setCenterPanelMode } = useWorkspaceStore();
+  const { data: project } = useProject(projectId);
 
-  const uploadFileMutation = useUploadFile(notebookId);
-  const uploadUrlMutation = useUploadUrl(notebookId);
-  const createTextNoteMutation = useCreateTextNote(notebookId);
+  const uploadFileMutation = useUploadFile(projectId);
+  const uploadUrlMutation = useUploadUrl(projectId);
+  const createTextNoteMutation = useCreateTextNote(projectId);
 
   // Active form view: null (show grid), or one of the form names
   const [activeForm, setActiveForm] = useState<"pdf" | "yt" | "text" | "vtt" | "web" | null>(null);
@@ -109,7 +109,7 @@ export function AddSourceGrid() {
     }
   };
 
-  if (!notebookId) return null;
+  if (!projectId) return null;
 
   return (
     <div className="w-full max-w-[850px] mx-auto py-10 px-4 md:px-8 flex flex-col justify-center min-h-[60vh]">
@@ -119,7 +119,7 @@ export function AddSourceGrid() {
         <div className="flex justify-between items-center mb-8 border-b border-[var(--border-subtle)] pb-4">
           <div>
             <h2 className="text-xl font-extrabold text-[var(--text-primary)]">
-              Add Sources to <span className="text-accent-orange font-bold">{selectedNotebook?.title}</span>
+              Add Sources
             </h2>
             <p className="text-xs text-[var(--text-muted)] mt-1">
               Select a format below to ingest content into your private research workspace.

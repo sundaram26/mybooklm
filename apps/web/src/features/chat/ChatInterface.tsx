@@ -8,10 +8,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useSession } from "../../lib/auth-client";
 import { useWorkspaceStore } from "../../store/workspaceStore";
 
-export function ChatInterface({ notebookId }: { notebookId: string }) {
+export function ChatInterface({ projectId }: { projectId: string }) {
   const queryClient = useQueryClient();
-  const { data: dbHistory = [] } = useChatHistory(notebookId);
-  const { data: documents = [] } = useDocuments(notebookId);
+  const { data: dbHistory = [] } = useChatHistory(projectId);
+  const { data: documents = [] } = useDocuments(projectId);
   const { data: session } = useSession();
   const user = session?.user;
   const isGuest = !user || (user as any).isAnonymous;
@@ -54,8 +54,8 @@ export function ChatInterface({ notebookId }: { notebookId: string }) {
     if (!queryText.trim() || isStreaming) return;
     setInput("");
 
-    const tempUser: ChatMessage = { id: `temp-${Date.now()}`, sessionId: notebookId, role: "user", content: queryText, parentId: activeParentId, createdAt: new Date().toISOString() };
-    const tempAssistant: ChatMessage = { id: `temp-a-${Date.now()}`, sessionId: notebookId, role: "assistant", content: "", parentId: tempUser.id, createdAt: new Date().toISOString() };
+    const tempUser: ChatMessage = { id: `temp-${Date.now()}`, sessionId: projectId, role: "user", content: queryText, parentId: activeParentId, createdAt: new Date().toISOString() };
+    const tempAssistant: ChatMessage = { id: `temp-a-${Date.now()}`, sessionId: projectId, role: "assistant", content: "", parentId: tempUser.id, createdAt: new Date().toISOString() };
 
     setMessages(prev => [...prev, tempUser, tempAssistant]);
     setIsStreaming(true);
@@ -63,7 +63,7 @@ export function ChatInterface({ notebookId }: { notebookId: string }) {
 
     try {
       await api.streamChat(
-        notebookId, queryText,
+        projectId, queryText,
         { parentId: activeParentId, selectedModelId },
         chunk => setMessages(prev => prev.map(m => m.id === tempAssistant.id ? { ...m, content: m.content + chunk } : m)),
         (fullText, metadata) => {
@@ -73,7 +73,7 @@ export function ChatInterface({ notebookId }: { notebookId: string }) {
           } else {
             setActiveParentId(tempAssistant.id);
           }
-          queryClient.invalidateQueries({ queryKey: ["chatHistory", notebookId] });
+          queryClient.invalidateQueries({ queryKey: ["chatHistory", projectId] });
         },
         err => { setIsStreaming(false); setMessages(prev => prev.map(m => m.id === tempAssistant.id ? { ...m, content: `Error: ${err.message}` } : m)); }
       );

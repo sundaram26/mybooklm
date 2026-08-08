@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Instrument_Serif } from "next/font/google";
 import "../globals.css";
 import { ThemeProvider } from "../components/theme-provider";
 import { QueryProvider } from "../components/providers/QueryProvider";
+import { Toaster } from "sonner";
 
 const jakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -18,6 +19,16 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   title: "noetalm - Grounded AI Research & Synthesis",
   description: "Grounded research platform for your custom documents, notes, web links, and media.",
+  openGraph: {
+    title: "noetalm - Grounded AI Research & Synthesis",
+    description: "Grounded research platform for your custom documents, notes, web links, and media.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "noetalm - Grounded AI Research & Synthesis",
+    description: "Grounded research platform for your custom documents, notes, web links, and media.",
+  },
 };
 
 export default function RootLayout({
@@ -31,6 +42,7 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider>
             {children}
+            <Toaster position="bottom-right" richColors />
           </ThemeProvider>
         </QueryProvider>
       </body>

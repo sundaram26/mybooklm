@@ -2,25 +2,22 @@
 
 import React, { useEffect } from "react";
 import { FileText, Image as ImageIcon, Link, Trash2, ExternalLink, RefreshCw, AlertCircle, CheckCircle2 } from "lucide-react";
-import { DocumentItem, api } from "../../lib/api";
-
-import { useWorkspaceStore } from "../../store/workspaceStore";
+import { api } from "../../lib/api";
 import { useDocuments, useDeleteDocument } from "../../lib/hooks";
+import { DocumentItem } from "@repo/shared";
 
-export function SourceList() {
-  const { selectedNotebook } = useWorkspaceStore();
-  const notebookId = selectedNotebook?.id || "";
-  const { data: documents = [], refetch: onRefresh } = useDocuments(notebookId);
-  const deleteDocumentMutation = useDeleteDocument(notebookId);
+export function SourceList({ projectId }: { projectId: string }) {
+  const { data: documents = [], refetch: onRefresh } = useDocuments(projectId);
+  const deleteDocumentMutation = useDeleteDocument(projectId);
 
   const handleDeleteDocument = async (docId: string) => {
-    if (!notebookId) return;
+    if (!projectId) return;
     await deleteDocumentMutation.mutateAsync(docId);
   };
 
   // Auto-poll status for documents in PENDING or PROCESSING state
   useEffect(() => {
-    if (!notebookId) return;
+    if (!projectId) return;
     const pendingDocs = documents.filter(d => d.status === "PENDING" || d.status === "PROCESSING");
     if (pendingDocs.length === 0) return;
 
@@ -28,7 +25,7 @@ export function SourceList() {
       let hasChanges = false;
       for (const doc of pendingDocs) {
         try {
-          const { status, progressMessage } = await api.getDocumentStatus(notebookId, doc.id);
+          const { status, progressMessage } = await api.getDocumentStatus(projectId, doc.id);
           if (status !== doc.status || progressMessage !== doc.progressMessage) {
             hasChanges = true;
           }
@@ -42,7 +39,7 @@ export function SourceList() {
     }, 10000);
 
     return () => clearInterval(interval);
-  }, [notebookId, documents, onRefresh]);
+  }, [projectId, documents, onRefresh]);
 
   const getIcon = (type: string) => {
     if (type === "IMAGE") return <ImageIcon size={18} style={{ color: "var(--status-warning-text)" }} />;
@@ -145,7 +142,7 @@ export function SourceList() {
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               {doc.status === "COMPLETED" && (
                 <a
-                  href={api.getDocumentFileProxyUrl(notebookId, doc.id)}
+                  href={api.getDocumentFileProxyUrl(projectId, doc.id)}
                   target="_blank"
                   rel="noreferrer"
                   className="btn btn-ghost"

@@ -1,16 +1,17 @@
 "use client";
 
 import React from "react";
-import { BookOpen, ArrowLeft, Copy, Settings, ChevronLeft } from "lucide-react";
-import { useWorkspaceStore } from "../../store/workspaceStore";
+import { BookOpen, Copy, Settings, ChevronLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useSession } from "../../lib/auth-client";
 import { useDocuments } from "../../lib/hooks";
+import { Project } from "@repo/shared";
 
-export function NotebookHeader({ notebook }: { notebook: any }) {
-  const { setSelectedNotebook, setCurrentView } = useWorkspaceStore();
+export function ProjectHeader({ project }: { project: Project }) {
+  const router = useRouter();
   const { data: session } = useSession();
   const user = session?.user;
-  const { data: documents = [] } = useDocuments(notebook?.id);
+  const { data: documents = [] } = useDocuments(project?.id);
 
   return (
     <header style={{
@@ -25,7 +26,7 @@ export function NotebookHeader({ notebook }: { notebook: any }) {
       {/* Left: back + title */}
       <div style={{ display: "flex", alignItems: "center", gap: "10px", overflow: "hidden" }}>
         <button
-          onClick={() => { setSelectedNotebook(null); setCurrentView("dashboard"); }}
+          onClick={() => { router.push("/"); }}
           style={{
             display: "flex", alignItems: "center", gap: "5px",
             background: "none", border: "none", cursor: "pointer",
@@ -38,7 +39,7 @@ export function NotebookHeader({ notebook }: { notebook: any }) {
           onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "var(--text-muted)"}
         >
           <ChevronLeft size={14} />
-          <span>Notebooks</span>
+          <span>Projects</span>
         </button>
 
         <div style={{ width: "1px", height: "16px", background: "var(--border-subtle)", flexShrink: 0 }} />
@@ -55,7 +56,7 @@ export function NotebookHeader({ notebook }: { notebook: any }) {
             fontSize: "0.84rem", fontWeight: 600, color: "var(--text-primary)",
             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
           }}>
-            {notebook.title}
+            {project.title}
           </span>
         </div>
 

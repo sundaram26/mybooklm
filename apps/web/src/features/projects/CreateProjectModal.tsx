@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import { X } from "lucide-react";
-import { useWorkspaceStore } from "../../store/workspaceStore";
-import { useCreateNotebook } from "../../lib/hooks";
+import { useRouter } from "next/navigation";
+import { useCreateProject } from "../../lib/hooks";
 
-export function CreateNotebookModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const { setSelectedNotebook, setCurrentView, setActiveTab } = useWorkspaceStore();
-  const createMutation = useCreateNotebook();
+export function CreateProjectModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const createMutation = useCreateProject();
+  const router = useRouter();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -27,13 +27,11 @@ export function CreateNotebookModal({ isOpen, onClose }: { isOpen: boolean; onCl
     setLoading(true);
     try {
       const created = await createMutation.mutateAsync({ title: title.trim(), description: description.trim() || undefined });
-      setSelectedNotebook(created);
-      setCurrentView("notebook");
-      setActiveTab("chat");
       reset();
       onClose();
+      router.push(`/project/${created.id}`);
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Failed to create notebook.");
+      setError(err?.response?.data?.message || "Failed to create project.");
     } finally {
       setLoading(false);
     }
@@ -77,7 +75,7 @@ export function CreateNotebookModal({ isOpen, onClose }: { isOpen: boolean; onCl
           borderBottom: "1px solid var(--border-subtle)",
         }}>
           <h3 style={{ fontSize: "0.875rem", fontWeight: "600", color: "var(--text-primary)" }}>
-            New Notebook
+            New Project
           </h3>
           <button onClick={handleClose} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", display: "flex", padding: "2px" }}>
             <X size={15} />

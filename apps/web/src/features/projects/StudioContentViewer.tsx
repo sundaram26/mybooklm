@@ -4,7 +4,7 @@ import {
   RotateCcw, HelpCircle, BookOpen, Layers, Play, 
   Map, Layout, Presentation, Table as TableIcon, Info
 } from "lucide-react";
-import { DocumentItem } from "../../lib/api";
+import { DocumentItem } from "@repo/shared";
 
 export function StudioContentViewer({ doc }: { doc: DocumentItem & { content?: string } }) {
   const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});

@@ -1,40 +1,33 @@
 "use client";
 
 import React from "react";
-import { Plus, BookOpen, Trash2, FileText, Clock, ArrowUpRight } from "lucide-react";
-import { Notebook } from "../../lib/api";
+import { Plus, BookOpen, Trash2, FileText, Clock } from "lucide-react";
 import { useWorkspaceStore } from "../../store/workspaceStore";
-import { useNotebooks, useDeleteNotebook } from "../../lib/hooks";
+import { useProjects, useDeleteProject, useCreateProject } from "../../lib/hooks";
+import { formatRelativeTime } from "../../lib/utils";
+import { useRouter } from "next/navigation";
+import { ProjectWithCounts } from "@repo/shared";
 
-interface NotebookGridProps {
-  searchQuery: string;
+interface ProjectGridProps {
+  searchQuery?: string;
 }
 
-function timeAgo(dateStr: string): string {
-  const diffMs = Date.now() - new Date(dateStr).getTime();
-  const mins  = Math.floor(diffMs / 60000);
-  const hours = Math.floor(mins  / 60);
-  const days  = Math.floor(hours / 24);
-  if (mins  < 1)  return "just now";
-  if (mins  < 60) return `${mins}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  if (days  < 30) return `${days}d ago`;
-  return new Date(dateStr).toLocaleDateString();
-}
+export function ProjectGrid({ searchQuery = "" }: ProjectGridProps) {
+  const { setCreateModalOpen } = useWorkspaceStore();
+  const { data: projects = [], isLoading } = useProjects();
+  const deleteMutation = useDeleteProject();
+  const router = useRouter();
 
-export function NotebookGrid({ searchQuery }: NotebookGridProps) {
-  const { setSelectedNotebook, setCurrentView, setActiveTab, setCreateModalOpen } = useWorkspaceStore();
-  const { data: notebooks = [], isLoading } = useNotebooks();
-  const deleteMutation = useDeleteNotebook();
-
-  const open = (nb: Notebook) => { setSelectedNotebook(nb); setCurrentView("notebook"); setActiveTab("chat"); };
+  const open = (nb: ProjectWithCounts) => { 
+    router.push(`/project/${nb.id}`);
+  };
 
   const del = async (e: React.MouseEvent, id: string, title: string) => {
     e.stopPropagation();
     if (confirm(`Delete "${title}"?`)) await deleteMutation.mutateAsync(id);
   };
 
-  const filtered = notebooks.filter(nb =>
+  const filtered = projects.filter(nb =>
     nb.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (nb.description?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
   );
@@ -67,7 +60,7 @@ export function NotebookGrid({ searchQuery }: NotebookGridProps) {
 
   const thead: React.CSSProperties = {
     display: "grid",
-    gridTemplateColumns: "1fr 100px 90px 80px 36px",
+    gridTemplateColumns: "1fr 100px 90px 36px",
     padding: "0 16px",
     borderBottom: "1px solid var(--border-subtle)",
     background: "var(--bg-surface)",
@@ -88,10 +81,10 @@ export function NotebookGrid({ searchQuery }: NotebookGridProps) {
         <div style={pageTitle}>
           <div>
             <h1 style={{ fontSize: "1rem", fontWeight: "600", color: "var(--text-primary)", marginBottom: "2px" }}>
-              Notebooks
+              Projects
             </h1>
             <p style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-              {notebooks.length} notebook{notebooks.length !== 1 ? "s" : ""} · grounded AI research workspace
+              {projects.length} project{projects.length !== 1 ? "s" : ""} · grounded AI research workspace
             </p>
           </div>
           <button
@@ -99,7 +92,7 @@ export function NotebookGrid({ searchQuery }: NotebookGridProps) {
             className="btn btn-primary"
           >
             <Plus size={13} />
-            New Notebook
+            New Project
           </button>
         </div>
 
@@ -124,14 +117,12 @@ export function NotebookGrid({ searchQuery }: NotebookGridProps) {
               <span style={th}>Name</span>
               <span style={{ ...th, textAlign: "right" }}>Sources</span>
               <span style={{ ...th, textAlign: "right" }}>Updated</span>
-              <span style={{ ...th, textAlign: "right" }}>Size</span>
               <span style={th} />
             </div>
 
             {/* Data rows */}
             {filtered.map((nb, idx) => {
-              const docCount = nb._count?.documents ?? nb.documents?.length ?? 0;
-              const sizeMB   = ((nb.documents || []).reduce((a, d) => a + (d.fileSize || 0), 0) / 1048576).toFixed(1);
+              const docCount = (nb as ProjectWithCounts)._count?.documents ?? (nb as ProjectWithCounts).documents?.length ?? 0;
               const isLast   = idx === filtered.length - 1;
 
               return (
@@ -140,7 +131,7 @@ export function NotebookGrid({ searchQuery }: NotebookGridProps) {
                   onClick={() => open(nb)}
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "1fr 100px 90px 80px 36px",
+                    gridTemplateColumns: "1fr 100px 90px 36px",
                     padding: "0 16px",
                     borderBottom: isLast ? "none" : "1px solid var(--border-subtle)",
                     background: "var(--bg-surface)",
@@ -176,12 +167,7 @@ export function NotebookGrid({ searchQuery }: NotebookGridProps) {
                   {/* Updated */}
                   <div style={{ textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "5px" }}>
                     <Clock size={11} style={{ color: "var(--text-subtle)" }} />
-                    <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>{timeAgo(nb.updatedAt)}</span>
-                  </div>
-
-                  {/* Size */}
-                  <div style={{ textAlign: "right" }}>
-                    <span style={{ fontSize: "0.72rem", color: "var(--text-subtle)" }}>{sizeMB} MB</span>
+                    <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>{formatRelativeTime(nb.updatedAt)}</span>
                   </div>
 
                   {/* Delete */}
@@ -217,15 +203,15 @@ export function NotebookGrid({ searchQuery }: NotebookGridProps) {
           }}>
             <BookOpen size={22} style={{ color: "var(--text-subtle)", marginBottom: "10px" }} />
             <p style={{ fontSize: "0.875rem", fontWeight: "500", color: "var(--text-secondary)", marginBottom: "4px" }}>
-              {searchQuery ? `No results for "${searchQuery}"` : "No notebooks yet"}
+              {searchQuery ? `No results for "${searchQuery}"` : "No projects yet"}
             </p>
             <p style={{ fontSize: "0.78rem", color: "var(--text-subtle)", marginBottom: "16px" }}>
-              {searchQuery ? "Try a different search." : "Create a notebook to start grounding your AI research."}
+              {searchQuery ? "Try a different search." : "Create a project to start grounding your AI research."}
             </p>
             {!searchQuery && (
               <button onClick={() => setCreateModalOpen(true)} className="btn btn-primary">
                 <Plus size={13} />
-                Create Notebook
+                Create Project
               </button>
             )}
           </div>

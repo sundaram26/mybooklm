@@ -14,13 +14,12 @@ const YoutubeIcon = ({ size = 14 }: { size?: number }) => (
   </svg>
 );
 
-export function NotebookSidebar() {
+export function ProjectSidebar({ projectId }: { projectId: string }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({});
-  const { selectedNotebook, setCenterPanelMode, selectedDocumentId, setSelectedDocumentId } = useWorkspaceStore();
-  const notebookId = selectedNotebook?.id || "";
-  const { data: documents = [], isLoading } = useDocuments(notebookId || undefined);
-  const deleteMutation = useDeleteDocument(notebookId);
+  const { setCenterPanelMode, selectedDocumentId, setSelectedDocumentId } = useWorkspaceStore();
+  const { data: documents = [], isLoading } = useDocuments(projectId);
+  const deleteMutation = useDeleteDocument(projectId);
 
   const getDocIcon = (doc: any) => {
     const t = doc.title?.toLowerCase() || "";

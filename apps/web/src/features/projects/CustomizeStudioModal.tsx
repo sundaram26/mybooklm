@@ -2,20 +2,22 @@ import React, { useState } from "react";
 import { X, Play, HelpCircle, Sparkles, Check, ChevronDown } from "lucide-react";
 import { useWorkspaceStore } from "../../store/workspaceStore";
 import { useGenerateStudio } from "../../lib/hooks";
+import { toast } from "sonner";
 
 export function CustomizeStudioModal({
   isOpen,
   feature,
-  onClose
+  onClose,
+  projectId
 }: {
   isOpen: boolean;
   feature: string | null;
   onClose: () => void;
+  projectId: string;
 }) {
-  const { selectedNotebook, setSelectedDocumentId, setCenterPanelMode, selectedModelId } = useWorkspaceStore();
-  const notebookId = selectedNotebook?.id || "";
+  const { setSelectedDocumentId, setCenterPanelMode, selectedModelId } = useWorkspaceStore();
   
-  const generateStudioMutation = useGenerateStudio(notebookId);
+  const generateStudioMutation = useGenerateStudio(projectId);
 
   // Customize states
   // Quiz
@@ -67,7 +69,7 @@ export function CustomizeStudioModal({
       }
       onClose();
     } catch (err) {
-      alert("Failed to generate studio content: " + (err as Error).message);
+      toast.error("Failed to generate studio content: " + (err as Error).message);
     }
   };
 
