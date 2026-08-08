@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-ink: #0F1521;
+  --color-slate-900: #1C2433;
+  --color-slate-500: #6B7789;
+  --color-slate-200: #E4E8ED;
+  --color-paper: #FAFAF9;
+  --color-accent: #FF5A1F;
+  --font-display: var(--font-space-grotesk);
+  --font-body: var(--font-inter);
+  
+  --animate-fade-in-up: fade-in-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+:root {
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes parallax {
+  from {
+    transform: translateY(-2%);
+  }
+  to {
+    transform: translateY(2%);
+  }
+}
+
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fade-in-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .motion-safe\:animate-\[parallax_10s_ease-in-out_infinite_alternate\] {
+    animation: none;
+  }
+}
